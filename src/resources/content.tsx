@@ -2,14 +2,14 @@ import { About, Blog, Gallery, Home, Newsletter, Person, Social, Work } from "@/
 import { Line, Logo, Row, Text } from "@once-ui-system/core";
 
 const person: Person = {
-  firstName: "Selene",
-  lastName: "Yu",
-  name: `Selene Yu`,
-  role: "Design Engineer",
-  avatar: "/images/avatar.jpg",
-  email: "example@gmail.com",
-  location: "Asia/Jakarta", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
-  languages: ["English", "Bahasa"], // optional: Leave the array empty if you don't want to display languages
+  firstName: "Atharva",
+  lastName: "Kanherkar",
+  name: `Atharva Kanherkar`,
+  role: "Software Engineer",
+  avatar: "/images/avatar.png",
+  email: "atharvakanherkar25@gmail.com",
+  location: "Asia/Kolkata", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
+  languages: ["English"], // optional: Leave the array empty if you don't want to display languages
 };
 
 const newsletter: Newsletter = {
@@ -24,18 +24,14 @@ const social: Social = [
   {
     name: "GitHub",
     icon: "github",
-    link: "https://github.com/once-ui-system",
+    link: "https://github.com/Atharva-Kanherkar",
   },
   {
     name: "LinkedIn",
     icon: "linkedin",
-    link: "https://www.linkedin.com/company/once-ui/",
+    link: "https://www.linkedin.com/in/atharva-kanherkar-4370a3257/",
   },
-  {
-    name: "Threads",
-    icon: "threads",
-    link: "https://www.threads.com/@once_ui",
-  },
+
   {
     name: "Email",
     icon: "email",
@@ -65,14 +61,9 @@ const home: Home = {
   },
   subline: (
     <>
-      I'm Selene, a design engineer at{" "}
-      <Logo
-        dark
-        icon="/trademarks/wordmark-dark.svg"
-        style={{ display: "inline-flex", top: "0.25em", marginLeft: "-0.25em" }}
-      />
-      , where I craft intuitive
-      <br /> user experiences. After hours, I build my own projects.
+      I'm Atharva, a software engineer  
+     
+      
     </>
   ),
 };
@@ -98,134 +89,169 @@ const about: About = {
     title: "Introduction",
     description: (
       <>
-        Selene is a Jakarta-based design engineer with a passion for transforming complex challenges
-        into simple, elegant design solutions. Her work spans digital interfaces, interactive
-        experiences, and the convergence of design and technology.
-      </>
+      I am a backend-focused fullstack developer with a strong foundation in open source and DevOps. I’ve contributed to projects through GSoC (Workflows4s), the Linux Foundation’s LFX Mentorship, and Typelevel, while also working on distributed, data-driven systems at Rimo in Tokyo. Skilled in Go, TypeScript, and cloud-native technologies, I thrive on building scalable backends, developer-first tools, and production-ready SaaS products.
+       </>
     ),
   },
   work: {
-    display: true, // set to false to hide this section
-    title: "Work Experience",
-    experiences: [
-      {
-        company: "FLY",
-        timeframe: "2022 - Present",
-        role: "Senior Design Engineer",
-        achievements: [
-          <>
-            Redesigned the UI/UX for the FLY platform, resulting in a 20% increase in user
-            engagement and 30% faster load times.
-          </>,
-          <>
-            Spearheaded the integration of AI tools into design workflows, enabling designers to
-            iterate 50% faster.
-          </>,
-        ],
-        images: [
-          // optional: leave the array empty if you don't want to display images
-          {
-            src: "/images/projects/project-01/cover-01.jpg",
-            alt: "Once UI Project",
-            width: 16,
-            height: 9,
-          },
-        ],
-      },
-      {
-        company: "Creativ3",
-        timeframe: "2018 - 2022",
-        role: "Lead Designer",
-        achievements: [
-          <>
-            Developed a design system that unified the brand across multiple platforms, improving
-            design consistency by 40%.
-          </>,
-          <>
-            Led a cross-functional team to launch a new product line, contributing to a 15% increase
-            in overall company revenue.
-          </>,
-        ],
-        images: [],
-      },
-    ],
-  },
+  display: true,
+  title: "Work Experience",
+  experiences: [
+    {
+      company: "Rimo LLC, Tokyo",
+      timeframe: "May 2025 – Jul 2025",
+      role: "Software Engineering Intern (Workflows Team)",
+      achievements: [
+        <>
+          Implemented crucial backend components including Node.js version upgrades, 
+          workflow-wide consistency validation, and Temporal engine separation.
+        </>,
+        <>
+          Improved developer experience and workflow data management visualization 
+          by handling foundational upgrades and system-wide management.
+        </>,
+      ],
+      images: [],
+    },
+    {
+      company: "Linux Foundation – Open Mainframe Project (Zowe)",
+      timeframe: "Jan 2025 – Apr 2025",
+      role: "LFX Mentorship Program Developer",
+      achievements: [
+        <>
+          Contributed to Zowe by improving documentation, refactoring 
+          core logic, and fixing keyring-related errors.
+        </>,
+        <>
+          Designed solutions that improved onboarding experience and 
+          developer productivity for Zowe contributors.
+        </>,
+      ],
+      images: [],
+    },
+    {
+      company: "The Palisadoes Foundation",
+      timeframe: "2024 – Present",
+      role: "Open Source Maintainer",
+      achievements: [
+        <>
+          Maintainer for multiple repositories under the Palisadoes Foundation, 
+          reviewing pull requests, guiding contributors, and improving code quality.
+        </>,
+        <>
+          Ensured long-term sustainability of open source projects 
+          through active mentorship and documentation improvements.
+        </>,
+      ],
+      images: [],
+    },
+    {
+      company: "Google Summer of Code – Workflows4s",
+      timeframe: "May 2025 – Aug 2025",
+      role: "Open Source Developer",
+      achievements: [
+        <>
+          Developing a web UI for inspecting workflow details in Workflows4s 
+          using Scala.js, Tapir, and Scala HTTP server technologies.
+        </>,
+        <>
+          Implementing features such as state inspection, timeline visualization, 
+          and real-time workflow updates.
+        </>,
+      ],
+      images: [],
+    },
+    {
+      company: "Typelevel",
+      timeframe: "2025 – Present",
+      role: "Open Source Contributor",
+      achievements: [
+        <>
+          Contributed to Cats Effect and other Typelevel projects, 
+          improving functional programming libraries in Scala.
+        </>,
+        <>
+          Actively engaged with the community to resolve issues 
+          and propose performance-oriented solutions.
+        </>,
+      ],
+      images: [],
+    },
+  ],
+},
+
   studies: {
-    display: true, // set to false to hide this section
-    title: "Studies",
-    institutions: [
-      {
-        name: "University of Jakarta",
-        description: <>Studied software engineering.</>,
-      },
-      {
-        name: "Build the Future",
-        description: <>Studied online marketing and personal branding.</>,
-      },
-    ],
-  },
-  technical: {
-    display: true, // set to false to hide this section
-    title: "Technical skills",
-    skills: [
-      {
-        title: "Figma",
-        description: (
-          <>Able to prototype in Figma with Once UI with unnatural speed.</>
-        ),
-        tags: [
-          {
-            name: "Figma",
-            icon: "figma",
-          },
-        ],
-        // optional: leave the array empty if you don't want to display images
-        images: [
-          {
-            src: "/images/projects/project-01/cover-02.jpg",
-            alt: "Project image",
-            width: 16,
-            height: 9,
-          },
-          {
-            src: "/images/projects/project-01/cover-03.jpg",
-            alt: "Project image",
-            width: 16,
-            height: 9,
-          },
-        ],
-      },
-      {
-        title: "Next.js",
-        description: (
-          <>Building next gen apps with Next.js + Once UI + Supabase.</>
-        ),
-        tags: [
-          {
-            name: "JavaScript",
-            icon: "javascript",
-          },
-          {
-            name: "Next.js",
-            icon: "nextjs",
-          },
-          {
-            name: "Supabase",
-            icon: "supabase",
-          },
-        ],
-        // optional: leave the array empty if you don't want to display images
-        images: [
-          {
-            src: "/images/projects/project-01/cover-04.jpg",
-            alt: "Project image",
-            width: 16,
-            height: 9,
-          },
-        ],
-      },  
-    ],
-  },
+  display: true, 
+  title: "Studies",
+  institutions: [
+    {
+      name: "Indian Institute of Information Technology, Design & Manufacturing, Jabalpur",
+      description: <>Pursuing B.Tech in Computer Science & Engineering (2022 – Present).</>,
+    },
+    {
+      name: "Self-Directed Learning & Open Source",
+      description: <>Contributions and mentorships through Google Summer of Code, Linux Foundation LFX, and Typelevel — gaining expertise in backend systems, functional programming, and DevOps.</>,
+    },
+  ],
+},
+
+technical: {
+  display: true, 
+  title: "Technical Skills",
+  skills: [
+    {
+      title: "Backend Development",
+      description: (
+        <>Experienced in building scalable distributed systems, RESTful APIs, and microservices with Go, Node.js, and Scala.</>
+      ),
+      tags: [
+        { name: "Go", icon: "go" },
+        { name: "Node.js", icon: "nodejs" },
+        { name: "Scala", icon: "scala" },
+        { name: "Express", icon: "express" },
+      ],
+      images: [],
+    },
+    {
+      title: "Frontend & Fullstack",
+      description: (
+        <>Proficient in building production-ready applications with TypeScript, Next.js, and React, integrated with modern backends.</>
+      ),
+      tags: [
+        { name: "TypeScript", icon: "typescript" },
+        { name: "Next.js", icon: "nextjs" },
+        { name: "React", icon: "react" },
+      ],
+      images: [],
+    },
+    {
+      title: "DevOps & Cloud",
+      description: (
+        <>Hands-on with Docker, Kubernetes, CI/CD, and cloud deployments (AWS, GCP). Skilled in containerized workflows and monitoring with Prometheus & Grafana.</>
+      ),
+      tags: [
+        { name: "Docker", icon: "docker" },
+        { name: "Kubernetes", icon: "kubernetes" },
+        { name: "AWS", icon: "aws" },
+        { name: "GCP", icon: "gcp" },
+      ],
+      images: [],
+    },
+    {
+      title: "Databases & Systems",
+      description: (
+        <>Experienced with relational and non-relational databases (PostgreSQL, MongoDB, Redis) and exploring database internals in Scala.</>
+      ),
+      tags: [
+        { name: "PostgreSQL", icon: "postgresql" },
+        { name: "MongoDB", icon: "mongodb" },
+        { name: "Redis", icon: "redis" },
+      ],
+      images: [],
+    },
+  ],
+},
+
 };
 
 const blog: Blog = {

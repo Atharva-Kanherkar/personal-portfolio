@@ -17,7 +17,7 @@ import { home } from "./index";
 const baseURL: string = "https://demo.magic-portfolio.com";
 
 const routes: RoutesConfig = {
-  "/": true,
+  "/": false,
   "/about": true,
   "/work": true,
   "/blog": true,
@@ -39,6 +39,7 @@ const protectedRoutes: ProtectedRoutesConfig = {
 // Import and set font for each variant
 import { Geist } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
+import { FaBullseye } from "react-icons/fa6";
 
 const heading = Geist({
   variable: "--font-heading",
