@@ -197,10 +197,10 @@ export default function SpotifyAnalytics() {
   }
 
   return (
-    <Column fillWidth gap="xl" paddingY="24" horizontal="center">
-      <Column maxWidth="l" fillWidth gap="xl" paddingX="24">
+    <Column fillWidth gap="l" paddingY="20" horizontal="center">
+      <Column maxWidth="l" fillWidth gap="l" paddingX="24">
         {/* Header */}
-        <Column fillWidth gap="16" horizontal="center">
+        <Column fillWidth gap="12" horizontal="center">
           <Row gap="12" vertical="center" horizontal="center">
             <Button onClick={() => { window.location.href = '/'; }} variant="tertiary" size="s">
               <FaArrowLeft />
@@ -229,39 +229,39 @@ export default function SpotifyAnalytics() {
         </Row>
 
       {/* Stats Overview */}
-      <Column fillWidth gap="16">
+      <Column fillWidth gap="12">
         <Heading variant="heading-strong-l">
           <FaCalendarAlt /> Listening Statistics - {stats?.time_range_label}
         </Heading>
         
         {stats && (
-          <Row fillWidth gap="16" wrap>
-            <Card flex={1} padding="24" radius="l" background="surface" minWidth={200}>
+          <Row fillWidth gap="12" wrap>
+            <Card flex={1} padding="16" radius="l" background="surface" minWidth={160}>
               <Column gap="8" horizontal="center">
-                <FaMusic color="#1DB954" size={24} />
-                <Text variant="heading-strong-xl">{stats.total_tracks}</Text>
-                <Text variant="body-default-s" onBackground="neutral-weak">Top Tracks</Text>
+                <FaMusic color="#1DB954" size={20} />
+                <Text variant="heading-strong-l">{stats.total_tracks}</Text>
+                <Text variant="body-default-xs" onBackground="neutral-weak">Top Tracks</Text>
               </Column>
             </Card>
-            <Card flex={1} padding="24" radius="l" background="surface" minWidth={200}>
+            <Card flex={1} padding="16" radius="l" background="surface" minWidth={160}>
               <Column gap="8" horizontal="center">
-                <FaUsers color="#1DB954" size={24} />
-                <Text variant="heading-strong-xl">{stats.total_artists}</Text>
-                <Text variant="body-default-s" onBackground="neutral-weak">Artists</Text>
+                <FaUsers color="#1DB954" size={20} />
+                <Text variant="heading-strong-l">{stats.total_artists}</Text>
+                <Text variant="body-default-xs" onBackground="neutral-weak">Artists</Text>
               </Column>
             </Card>
-            <Card flex={1} padding="24" radius="l" background="surface" minWidth={200}>
+            <Card flex={1} padding="16" radius="l" background="surface" minWidth={160}>
               <Column gap="8" horizontal="center">
-                <FaClock color="#1DB954" size={24} />
-                <Text variant="heading-strong-xl">{formatListeningTime(stats.total_listening_time_ms)}</Text>
-                <Text variant="body-default-s" onBackground="neutral-weak">Total Time</Text>
+                <FaClock color="#1DB954" size={20} />
+                <Text variant="heading-strong-l">{formatListeningTime(stats.total_listening_time_ms)}</Text>
+                <Text variant="body-default-xs" onBackground="neutral-weak">Total Time</Text>
               </Column>
             </Card>
-            <Card flex={1} padding="24" radius="l" background="surface" minWidth={200}>
+            <Card flex={1} padding="16" radius="l" background="surface" minWidth={160}>
               <Column gap="8" horizontal="center">
-                <FaHeadphones color="#1DB954" size={24} />
-                <Text variant="heading-strong-xl">{stats.unique_genres}</Text>
-                <Text variant="body-default-s" onBackground="neutral-weak">Genres</Text>
+                <FaHeadphones color="#1DB954" size={20} />
+                <Text variant="heading-strong-l">{stats.unique_genres}</Text>
+                <Text variant="body-default-xs" onBackground="neutral-weak">Genres</Text>
               </Column>
             </Card>
           </Row>
@@ -348,7 +348,7 @@ export default function SpotifyAnalytics() {
                     <img 
                       src={track.image} 
                       alt={track.album}
-                      style={{ width: '48px', height: '48px', borderRadius: '4px' }}
+                      style={{ width: '40px', height: '40px', borderRadius: '4px' }}
                     />
                   )}
                   <Column flex={1} gap="4">
@@ -374,30 +374,30 @@ export default function SpotifyAnalytics() {
       <Card padding="24" radius="l" background="surface">
         <Column gap="16">
           <Heading variant="heading-strong-l">Your Top Artists</Heading>
-          <Row fillWidth gap="16" wrap>
+          <Row fillWidth gap="12" wrap>
             {artists.slice(0, 12).map((artist) => (
               <Card
                 key={artist.id}
-                padding="16"
+                padding="12"
                 radius="m"
                 background="neutral-alpha-weak"
                 className={styles.artistCard}
-                minWidth={200}
+                minWidth={140}
               >
-                <Column gap="12" horizontal="center">
+                <Column gap="8" horizontal="center">
                   {artist.image && (
                     <img
                       src={artist.image}
                       alt={artist.name}
                       style={{ 
-                        width: '80px', 
-                        height: '80px', 
+                        width: '60px', 
+                        height: '60px', 
                         borderRadius: '50%',
                         objectFit: 'cover'
                       }}
                     />
                   )}
-                  <Column gap="4" horizontal="center">
+                  <Column gap="2" horizontal="center">
                     <Text variant="body-strong-m" style={{ textAlign: 'center' }}>
                       {artist.name}
                     </Text>
