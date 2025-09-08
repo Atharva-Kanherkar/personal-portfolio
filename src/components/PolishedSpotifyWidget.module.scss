@@ -79,6 +79,26 @@
     }
   }
   
+  &.hasPreview {
+    background: rgba(29, 185, 84, 0.95);
+    border: 2px solid rgba(29, 185, 84, 0.6);
+    
+    &:hover {
+      background: rgba(29, 185, 84, 1);
+      border-color: rgba(29, 185, 84, 1);
+    }
+  }
+  
+  &.noPreview {
+    background: rgba(156, 163, 175, 0.8);
+    border: 2px solid rgba(156, 163, 175, 0.4);
+    
+    &:hover {
+      background: rgba(156, 163, 175, 1);
+      border-color: rgba(156, 163, 175, 0.8);
+    }
+  }
+  
   &.fullPlayback {
     background: rgba(29, 185, 84, 1);
     opacity: 0.9;
@@ -198,5 +218,88 @@
   .currentTrackName {
     max-width: 150px;
     font-size: 0.9rem;
+  }
+}
+
+/* Tabs Styling */
+.tabsContainer {
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tabButton {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+  
+  &.activeTab {
+    background: rgba(29, 185, 84, 1) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+  }
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Now Playing Card */
+.nowPlayingCard {
+  animation: slideIn 0.3s ease-out;
+  border: 2px solid rgba(29, 185, 84, 0.4);
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.05));
+  
+  &:hover {
+    border-color: rgba(29, 185, 84, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(29, 185, 84, 0.2);
+  }
+}
+
+.nowPlayingCover {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.playingIndicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(29, 185, 84, 0.9);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.pulsingIcon {
+  animation: pulse 2s infinite;
+  font-size: 14px;
+}
+
+/* Dark mode support for tabs */
+@media (prefers-color-scheme: dark) {
+  .tabsContainer {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .nowPlayingCard {
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.15), rgba(29, 185, 84, 0.08));
   }
 }

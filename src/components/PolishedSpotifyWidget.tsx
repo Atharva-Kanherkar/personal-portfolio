@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { Column, Row, Text, Heading, Card, Button } from "@once-ui-system/core";
-import { FaSpotify, FaPlay, FaPause, FaExternalLinkAlt, FaUser, FaStepForward, FaStepBackward } from 'react-icons/fa';
+import { FaSpotify, FaPlay, FaPause, FaExternalLinkAlt, FaUser, FaStepForward, FaStepBackward, FaFire, FaClock, FaList, FaMusic } from 'react-icons/fa';
 import styles from './PolishedSpotifyWidget.module.scss';
 
 // Extend Window interface for Spotify Web Playback SDK
@@ -32,11 +32,34 @@ interface Track {
   popularity?: number;
 }
 
+interface Playlist {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  external_url: string;
+  tracks: { total: number };
+}
+
+interface CurrentlyPlaying {
+  id: string;
+  name: string;
+  artist: string;
+  album: string;
+  image: string;
+  external_url: string;
+  is_playing: boolean;
+  progress_ms: number;
+  duration_ms: number;
+}
+
 interface SpotifyProfile {
   id: string;
   display_name: string;
   external_urls: { spotify: string };
 }
+
+type TabType = 'top-tracks' | 'recent-tracks' | 'playlists' | 'currently-playing';
 
 interface PolishedSpotifyWidgetProps {
   className?: string;
@@ -86,6 +109,9 @@ interface SpotifyPlayer {
 
 export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ className }) => {
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [recentTracks, setRecentTracks] = useState<Track[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [currentlyPlayingTrack, setCurrentlyPlayingTrack] = useState<CurrentlyPlaying | null>(null);
   const [profile, setProfile] = useState<SpotifyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
@@ -93,6 +119,13 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
   const [isSpotifyReady, setIsSpotifyReady] = useState(false);
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [currentPlayback, setCurrentPlayback] = useState<SpotifyPlaybackState | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('top-tracks');
+  const [tabLoading, setTabLoading] = useState<{ [key in TabType]: boolean }>({
+    'top-tracks': false,
+    'recent-tracks': false,
+    'playlists': false,
+    'currently-playing': false,
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playerRef = useRef<SpotifyPlayer | null>(null);
 
@@ -135,14 +168,13 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
 
   useEffect(() => {
     fetchSpotifyData();
+    fetchProfileData();
   }, []);
 
   const fetchSpotifyData = async () => {
+    setTabLoading(prev => ({ ...prev, 'top-tracks': true }));
     try {
-      const [tracksResponse, profileResponse] = await Promise.all([
-        fetch('/api/spotify/top-tracks'),
-        fetch('/api/spotify/profile')
-      ]);
+      const tracksResponse = await fetch('/api/spotify/top-tracks');
 
       if (tracksResponse.ok) {
         const tracksData = await tracksResponse.json();
@@ -158,64 +190,158 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         setTracks(demoTracks);
         setError('Using demo tracks');
       }
+    } catch (err) {
+      console.error('Error fetching Spotify data:', err);
+      setTracks(demoTracks);
+      setError('Using demo tracks');
+    } finally {
+      setTabLoading(prev => ({ ...prev, 'top-tracks': false }));
+      setLoading(false);
+    }
+  };
 
+  const fetchProfileData = async () => {
+    try {
+      const profileResponse = await fetch('/api/spotify/profile');
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
         console.log('Spotify profile data:', profileData); // Debug log
         setProfile(profileData);
       }
     } catch (err) {
-      console.error('Error fetching Spotify data:', err);
-      setTracks(demoTracks);
-      setError('Using demo tracks');
+      console.error('Error fetching profile data:', err);
+    }
+  };
+
+  const fetchRecentTracks = async () => {
+    setTabLoading(prev => ({ ...prev, 'recent-tracks': true }));
+    try {
+      const response = await fetch('/api/spotify/recent-tracks');
+      if (response.ok) {
+        const data = await response.json();
+        setRecentTracks(data.tracks || []);
+      }
+    } catch (err) {
+      console.error('Error fetching recent tracks:', err);
     } finally {
-      setLoading(false);
+      setTabLoading(prev => ({ ...prev, 'recent-tracks': false }));
+    }
+  };
+
+  const fetchPlaylists = async () => {
+    setTabLoading(prev => ({ ...prev, 'playlists': true }));
+    try {
+      const response = await fetch('/api/spotify/playlists');
+      if (response.ok) {
+        const data = await response.json();
+        setPlaylists(data.playlists || []);
+      }
+    } catch (err) {
+      console.error('Error fetching playlists:', err);
+    } finally {
+      setTabLoading(prev => ({ ...prev, 'playlists': false }));
+    }
+  };
+
+  const fetchCurrentlyPlaying = async () => {
+    setTabLoading(prev => ({ ...prev, 'currently-playing': true }));
+    try {
+      const response = await fetch('/api/spotify/current-playing');
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentlyPlayingTrack(data.currentlyPlaying || null);
+      }
+    } catch (err) {
+      console.error('Error fetching currently playing:', err);
+    } finally {
+      setTabLoading(prev => ({ ...prev, 'currently-playing': false }));
+    }
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    
+    switch (tab) {
+      case 'recent-tracks':
+        if (recentTracks.length === 0) fetchRecentTracks();
+        break;
+      case 'playlists':
+        if (playlists.length === 0) fetchPlaylists();
+        break;
+      case 'currently-playing':
+        fetchCurrentlyPlaying(); // Always refresh
+        break;
+      case 'top-tracks':
+        // Already loaded
+        break;
     }
   };
 
   const handlePlayPreview = (track: Track) => {
-    console.log('handlePlayPreview called for track:', track.name, 'preview_url:', track.preview_url);
+    console.log('=== PLAY ATTEMPT ===');
+    console.log('Track:', track.name);
+    console.log('Preview URL:', track.preview_url);
+    console.log('Preview URL type:', typeof track.preview_url);
+    console.log('Preview URL length:', track.preview_url?.length);
     
+    // Check if preview URL exists and is valid
     if (!track.preview_url || track.preview_url === null || track.preview_url.trim() === '') {
-      console.log('No preview URL available, opening in Spotify');
-      // Open in Spotify if no preview
-      window.open(track.external_url, '_blank');
+      console.log('❌ NO PREVIEW AVAILABLE - This track has no 30-second preview');
+      
+      // Instead of opening Spotify immediately, show user a message
+      const userWantsSpotify = confirm(
+        `"${track.name}" doesn't have a preview available.\n\nWould you like to open it in Spotify instead?`
+      );
+      
+      if (userWantsSpotify) {
+        window.open(track.external_url, '_blank');
+      }
       return;
     }
 
     if (currentPlaying === track.id) {
-      console.log('Pausing current track');
-      // Pause current track
+      console.log('⏸️ PAUSING current track');
       if (audioRef.current) {
         audioRef.current.pause();
       }
       setCurrentPlaying(null);
     } else {
-      console.log('Playing new track preview:', track.preview_url);
-      // Stop current track if playing
+      console.log('▶️ PLAYING preview on your website');
+      
+      // Stop any currently playing track
       if (audioRef.current) {
         audioRef.current.pause();
       }
       
-      // Play new track
-      audioRef.current = new Audio(track.preview_url);
-      audioRef.current.volume = 0.7;
-      
-      audioRef.current.play().then(() => {
-        console.log('Audio started playing successfully');
-        setCurrentPlaying(track.id);
-      }).catch((error) => {
-        console.error('Audio play error:', error);
-        // Fallback to opening Spotify
-        alert(`Preview unavailable. Error: ${error.message}. Opening in Spotify...`);
+      // Create and play new audio
+      try {
+        audioRef.current = new Audio(track.preview_url);
+        audioRef.current.volume = 0.7;
+        
+        // Add loading state
+        console.log('🎵 Loading audio...');
+        
+        audioRef.current.play().then(() => {
+          console.log('✅ SUCCESS - Audio playing on your website!');
+          setCurrentPlaying(track.id);
+        }).catch((error) => {
+          console.error('❌ AUDIO PLAY FAILED:', error);
+          
+          // Show user what went wrong
+          alert(`Audio playback failed: ${error.message}\n\nTrying Spotify instead...`);
+          window.open(track.external_url, '_blank');
+        });
+        
+        // Auto-stop when preview ends
+        audioRef.current.onended = () => {
+          console.log('🔚 Preview ended');
+          setCurrentPlaying(null);
+        };
+        
+      } catch (error) {
+        console.error('❌ AUDIO SETUP FAILED:', error);
         window.open(track.external_url, '_blank');
-      });
-      
-      // Reset when track ends
-      audioRef.current.onended = () => {
-        console.log('Track preview ended');
-        setCurrentPlaying(null);
-      };
+      }
     }
   };
 
@@ -489,72 +615,314 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         </Row>
       )}
 
-      {/* Tracks Grid */}
-      <Column fillWidth gap="16">
-        {tracks.slice(0, 6).map((track) => (
-          <Card
-            key={track.id}
-            fillWidth
-            padding="20"
-            radius="l"
-            border="neutral-alpha-weak"
-            background="surface"
-            className={styles.trackCard}
+      {/* Beautiful Tabs Navigation */}
+      <Row fillWidth gap="8" horizontal="center" className={styles.tabsContainer}>
+        {[
+          { id: 'top-tracks', label: 'Top Tracks', icon: FaFire },
+          { id: 'recent-tracks', label: 'Recent', icon: FaClock },
+          { id: 'playlists', label: 'Playlists', icon: FaList },
+          { id: 'currently-playing', label: 'Now Playing', icon: FaMusic },
+        ].map((tab) => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? "primary" : "tertiary"}
+            size="s"
+            onClick={() => handleTabChange(tab.id as TabType)}
+            className={`${styles.tabButton} ${activeTab === tab.id ? styles.activeTab : ''}`}
           >
-            <Row fillWidth gap="16" vertical="center">
-              <div className={styles.albumCover}>
-                <img
-                  src={track.image}
-                  alt={`${track.album} cover`}
-                  className={styles.albumImage}
-                />
-                <button
-                  type="button"
-                  className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''}`}
-                  onClick={() => handlePlayPreview(track)}
-                  aria-label={
-                    currentPlaying === track.id ? 'Pause' : 
-                    track.preview_url ? 'Play 30s preview' : 'Open in Spotify'
-                  }
-                  title={
-                    track.preview_url ? '30-second preview' : 'Open in Spotify app'
-                  }
-                >
-                  {currentPlaying === track.id ? (
-                    <FaPause />
-                  ) : track.preview_url ? (
-                    <FaPlay />
-                  ) : (
-                    <FaExternalLinkAlt />
-                  )}
-                </button>
-              </div>
-
-              <Column flex={1} gap="8">
-                <Text variant="heading-strong-m" className={styles.trackName}>
-                  {track.name}
-                </Text>
-                <Text variant="body-default-m" onBackground="neutral-weak">
-                  {track.artist}
-                </Text>
-                <Text variant="body-default-s" onBackground="neutral-weak">
-                  {track.album} • {formatDuration(track.duration_ms)}
-                </Text>
-              </Column>
-
-              <Button
-                href={track.external_url}
-                variant="tertiary"
-                size="s"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open in Spotify"
-              >
-                <FaExternalLinkAlt />
-              </Button>
+            <Row gap="8" vertical="center">
+              <tab.icon size={14} />
+              <Text variant="label-default-s">{tab.label}</Text>
+              {tabLoading[tab.id as TabType] && (
+                <div className={styles.loadingSpinner}>⏳</div>
+              )}
             </Row>
-          </Card>
+          </Button>
         ))}
+      </Row>
+
+      {/* Dynamic Content Based on Active Tab */}
+      <Column fillWidth gap="16">
+        {/* Top Tracks Tab */}
+        {activeTab === 'top-tracks' && (
+          <>
+            {tracks.slice(0, 6).map((track) => (
+              <Card
+                key={track.id}
+                fillWidth
+                padding="20"
+                radius="l"
+                border="neutral-alpha-weak"
+                background="surface"
+                className={styles.trackCard}
+              >
+                <Row fillWidth gap="16" vertical="center">
+                  <div className={styles.albumCover}>
+                    <img
+                      src={track.image}
+                      alt={`${track.album} cover`}
+                      className={styles.albumImage}
+                    />
+                    <button
+                      type="button"
+                      className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''} ${track.preview_url ? styles.hasPreview : styles.noPreview}`}
+                      onClick={() => handlePlayPreview(track)}
+                      aria-label={
+                        currentPlaying === track.id ? 'Pause' : 
+                        track.preview_url ? 'Play 30s preview on this website' : 'No preview - open in Spotify'
+                      }
+                      title={
+                        track.preview_url ? 
+                          '▶️ Play 30-second preview directly on this website' : 
+                          '🎵 No preview available - will open in Spotify app'
+                      }
+                    >
+                      {currentPlaying === track.id ? (
+                        <FaPause />
+                      ) : track.preview_url ? (
+                        <FaPlay />
+                      ) : (
+                        <FaExternalLinkAlt />
+                      )}
+                    </button>
+                  </div>
+
+                  <Column flex={1} gap="8">
+                    <Text variant="heading-strong-m" className={styles.trackName}>
+                      {track.name}
+                    </Text>
+                    <Text variant="body-default-m" onBackground="neutral-weak">
+                      {track.artist}
+                    </Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">
+                      {track.album} • {formatDuration(track.duration_ms)}
+                      {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• ▶️ Preview available</span>}
+                    </Text>
+                  </Column>
+
+                  <Button
+                    href={track.external_url}
+                    variant="tertiary"
+                    size="s"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open in Spotify"
+                  >
+                    <FaExternalLinkAlt />
+                  </Button>
+                </Row>
+              </Card>
+            ))}
+          </>
+        )}
+
+        {/* Recent Tracks Tab */}
+        {activeTab === 'recent-tracks' && (
+          <>
+            {tabLoading['recent-tracks'] ? (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Text variant="body-default-m">Loading recent tracks...</Text>
+              </Row>
+            ) : recentTracks.length > 0 ? (
+              recentTracks.slice(0, 6).map((track) => (
+                <Card
+                  key={`recent-${track.id}`}
+                  fillWidth
+                  padding="20"
+                  radius="l"
+                  border="neutral-alpha-weak"
+                  background="surface"
+                  className={styles.trackCard}
+                >
+                  <Row fillWidth gap="16" vertical="center">
+                    <div className={styles.albumCover}>
+                      <img
+                        src={track.image}
+                        alt={`${track.album} cover`}
+                        className={styles.albumImage}
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''} ${track.preview_url ? styles.hasPreview : styles.noPreview}`}
+                        onClick={() => handlePlayPreview(track)}
+                      >
+                        {currentPlaying === track.id ? <FaPause /> : track.preview_url ? <FaPlay /> : <FaExternalLinkAlt />}
+                      </button>
+                    </div>
+                    <Column flex={1} gap="8">
+                      <Text variant="heading-strong-m" className={styles.trackName}>
+                        {track.name}
+                      </Text>
+                      <Text variant="body-default-m" onBackground="neutral-weak">
+                        {track.artist}
+                      </Text>
+                      <Text variant="body-default-s" onBackground="neutral-weak">
+                        {track.album} • {formatDuration(track.duration_ms)}
+                        {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• ▶️ Preview available</span>}
+                      </Text>
+                    </Column>
+                    <Button
+                      href={track.external_url}
+                      variant="tertiary"
+                      size="s"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <FaExternalLinkAlt />
+                    </Button>
+                  </Row>
+                </Card>
+              ))
+            ) : (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Text variant="body-default-m" onBackground="neutral-weak">
+                  No recent tracks found
+                </Text>
+              </Row>
+            )}
+          </>
+        )}
+
+        {/* Playlists Tab */}
+        {activeTab === 'playlists' && (
+          <>
+            {tabLoading['playlists'] ? (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Text variant="body-default-m">Loading playlists...</Text>
+              </Row>
+            ) : playlists.length > 0 ? (
+              playlists.slice(0, 6).map((playlist) => (
+                <Card
+                  key={playlist.id}
+                  fillWidth
+                  padding="20"
+                  radius="l"
+                  border="neutral-alpha-weak"
+                  background="surface"
+                  className={styles.trackCard}
+                >
+                  <Row fillWidth gap="16" vertical="center">
+                    <div className={styles.albumCover}>
+                      <img
+                        src={playlist.image}
+                        alt={`${playlist.name} cover`}
+                        className={styles.albumImage}
+                      />
+                    </div>
+                    <Column flex={1} gap="8">
+                      <Text variant="heading-strong-m" className={styles.trackName}>
+                        {playlist.name}
+                      </Text>
+                      <Text variant="body-default-m" onBackground="neutral-weak">
+                        {playlist.tracks.total} tracks
+                      </Text>
+                      <Text variant="body-default-s" onBackground="neutral-weak">
+                        {playlist.description || 'No description'}
+                      </Text>
+                    </Column>
+                    <Button
+                      href={playlist.external_url}
+                      variant="tertiary"
+                      size="s"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <FaExternalLinkAlt />
+                    </Button>
+                  </Row>
+                </Card>
+              ))
+            ) : (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Text variant="body-default-m" onBackground="neutral-weak">
+                  No playlists found
+                </Text>
+              </Row>
+            )}
+          </>
+        )}
+
+        {/* Currently Playing Tab */}
+        {activeTab === 'currently-playing' && (
+          <>
+            {tabLoading['currently-playing'] ? (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Text variant="body-default-m">Checking what's playing...</Text>
+              </Row>
+            ) : currentlyPlayingTrack ? (
+              <Card
+                fillWidth
+                padding="24"
+                radius="l"
+                border="brand-alpha-weak"
+                background="brand-alpha-weak"
+                className={styles.nowPlayingCard}
+              >
+                <Column fillWidth gap="20">
+                  <Row fillWidth gap="16" vertical="center">
+                    <div className={`${styles.albumCover} ${styles.nowPlayingCover}`}>
+                      <img
+                        src={currentlyPlayingTrack.image}
+                        alt={`${currentlyPlayingTrack.album} cover`}
+                        className={styles.albumImage}
+                      />
+                      {currentlyPlayingTrack.is_playing && (
+                        <div className={styles.playingIndicator}>
+                          <FaMusic className={styles.pulsingIcon} />
+                        </div>
+                      )}
+                    </div>
+                    <Column flex={1} gap="8">
+                      <Text variant="heading-strong-l" className={styles.trackName}>
+                        {currentlyPlayingTrack.name}
+                      </Text>
+                      <Text variant="body-default-l" onBackground="neutral-weak">
+                        {currentlyPlayingTrack.artist}
+                      </Text>
+                      <Text variant="body-default-m" onBackground="neutral-weak">
+                        {currentlyPlayingTrack.album}
+                      </Text>
+                      <Row gap="8" vertical="center">
+                        <Text variant="label-default-s" onBackground="brand-weak">
+                          {currentlyPlayingTrack.is_playing ? '▶️ Playing' : '⏸️ Paused'}
+                        </Text>
+                        <Text variant="label-default-s" onBackground="brand-weak">
+                          •
+                        </Text>
+                        <Text variant="label-default-s" onBackground="brand-weak">
+                          {formatDuration(currentlyPlayingTrack.progress_ms)} / {formatDuration(currentlyPlayingTrack.duration_ms)}
+                        </Text>
+                      </Row>
+                    </Column>
+                    <Button
+                      href={currentlyPlayingTrack.external_url}
+                      variant="secondary"
+                      size="m"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Row gap="8" vertical="center">
+                        <FaSpotify />
+                        Open in Spotify
+                      </Row>
+                    </Button>
+                  </Row>
+                </Column>
+              </Card>
+            ) : (
+              <Row fillWidth horizontal="center" paddingY="40">
+                <Column gap="12" horizontal="center">
+                  <Text variant="body-default-m" onBackground="neutral-weak">
+                    Nothing currently playing
+                  </Text>
+                  <Text variant="body-default-s" onBackground="neutral-weak">
+                    Start playing music on Spotify to see it here
+                  </Text>
+                </Column>
+              </Row>
+            )}
+          </>
+        )}
       </Column>
 
       {/* Footer */}
