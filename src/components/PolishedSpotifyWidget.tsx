@@ -627,9 +627,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
             <Row gap="8" vertical="center">
               <tab.icon size={14} />
               <Text variant="label-default-s">{tab.label}</Text>
-              {tabLoading[tab.id as TabType] && (
-                <div className={styles.loadingSpinner}>⏳</div>
-              )}
+              
             </Row>
           </Button>
         ))}
