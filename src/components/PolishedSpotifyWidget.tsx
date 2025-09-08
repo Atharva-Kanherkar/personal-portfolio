@@ -935,6 +935,20 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
           </Text>
         )}
       </Row>
+
+      {/* Analytics Navigation */}
+      <Row fillWidth horizontal="center" paddingTop="16">
+        <Button
+          href="/spotify-analytics"
+          variant="secondary"
+          size="m"
+        >
+          <Row gap="8" vertical="center">
+            <FaMusic />
+            View Detailed Analytics
+          </Row>
+        </Button>
+      </Row>
     </Column>
   );
 };

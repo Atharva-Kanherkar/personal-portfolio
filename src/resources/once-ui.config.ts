@@ -22,6 +22,7 @@ const routes: RoutesConfig = {
   "/blog": true,
   "/gallery": false,
   "/spotify-setup": true,
+  "/spotify-analytics": true,
 };
 
 const display: DisplayConfig = {
