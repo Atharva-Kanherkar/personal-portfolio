@@ -9,4 +9,5 @@ export { ScrollToHash } from "@/components/ScrollToHash";
 export { ThemeToggle } from "@/components/ThemeToggle";
 export { CustomMDX } from "@/components/mdx";
 export { SpotifyWidget } from "@/components/SpotifyWidget";
+export { PolishedSpotifyWidget } from "@/components/PolishedSpotifyWidget";
 export { EnhancedSpotifyWidget } from "@/components/EnhancedSpotifyWidget";

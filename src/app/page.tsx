@@ -1,4 +1,4 @@
- import {
+import {
   Heading,
   Text,
   Button,
@@ -12,7 +12,7 @@
   Line,
 } from "@once-ui-system/core";
 import { home, about, person, baseURL, routes } from "@/resources";
-import { Mailchimp, EnhancedSpotifyWidget } from "@/components";
+import { Mailchimp, PolishedSpotifyWidget } from "@/components";
 import { Projects } from "@/components/work/Projects";
 import { Posts } from "@/components/blog/Posts";
 import { Terminal } from "@/components/Terminal";
@@ -145,7 +145,7 @@ export default function Home() {
           <Row fillWidth paddingRight="64">
             <Line maxWidth={48} />
           </Row>
-          <EnhancedSpotifyWidget />
+          <PolishedSpotifyWidget />
           <Row fillWidth paddingLeft="64" horizontal="end">
             <Line maxWidth={48} />
           </Row>
