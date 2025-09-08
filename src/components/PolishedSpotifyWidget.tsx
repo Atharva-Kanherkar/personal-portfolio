@@ -3,8 +3,22 @@
 import type React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { Column, Row, Text, Heading, Card, Button } from "@once-ui-system/core";
-import { FaSpotify, FaPlay, FaPause, FaExternalLinkAlt, FaUser } from 'react-icons/fa';
+import { FaSpotify, FaPlay, FaPause, FaExternalLinkAlt, FaUser, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import styles from './PolishedSpotifyWidget.module.scss';
+
+// Extend Window interface for Spotify Web Playback SDK
+declare global {
+  interface Window {
+    Spotify: {
+      Player: new (options: {
+        name: string;
+        getOAuthToken: (cb: (token: string) => void) => void;
+        volume: number;
+      }) => SpotifyPlayer;
+    };
+    onSpotifyWebPlaybackSDKReady: () => void;
+  }
+}
 
 interface Track {
   id: string;
@@ -28,13 +42,59 @@ interface PolishedSpotifyWidgetProps {
   className?: string;
 }
 
+interface SpotifyPlaybackState {
+  device: {
+    id: string;
+    is_active: boolean;
+    name: string;
+    type: string;
+    volume_percent: number;
+  };
+  track_window: {
+    current_track: {
+      id: string;
+      name: string;
+      artists: Array<{ name: string }>;
+      album: { name: string; images: Array<{ url: string }> };
+      uri: string;
+    };
+  };
+  is_playing: boolean;
+  position: number;
+  duration: number;
+}
+
+interface SpotifyPlayer {
+  connect(): Promise<boolean>;
+  disconnect(): void;
+  addListener(event: 'ready', callback: (device: { device_id: string }) => void): void;
+  addListener(event: 'not_ready', callback: (device: { device_id: string }) => void): void;
+  addListener(event: 'player_state_changed', callback: (state: SpotifyPlaybackState | null) => void): void;
+  addListener(event: string, callback: (...args: unknown[]) => void): void;
+  removeListener(event: string, callback?: (...args: unknown[]) => void): void;
+  getCurrentState(): Promise<SpotifyPlaybackState | null>;
+  setName(name: string): Promise<void>;
+  getVolume(): Promise<number>;
+  setVolume(volume: number): Promise<void>;
+  pause(): Promise<void>;
+  resume(): Promise<void>;
+  togglePlay(): Promise<void>;
+  seek(position_ms: number): Promise<void>;
+  previousTrack(): Promise<void>;
+  nextTrack(): Promise<void>;
+}
+
 export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ className }) => {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [profile, setProfile] = useState<SpotifyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSpotifyReady, setIsSpotifyReady] = useState(false);
+  const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [currentPlayback, setCurrentPlayback] = useState<SpotifyPlaybackState | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playerRef = useRef<SpotifyPlayer | null>(null);
 
   // Demo tracks as fallback
   const demoTracks: Track[] = [
@@ -153,6 +213,164 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  // Initialize Spotify Web Playback SDK
+  useEffect(() => {
+    const initializeSpotifyPlayer = async () => {
+      // Load Spotify Web Playback SDK
+      if (!window.Spotify) {
+        const script = document.createElement('script');
+        script.src = 'https://sdk.scdn.co/spotify-player.js';
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Wait for SDK to load
+        await new Promise<void>((resolve) => {
+          window.onSpotifyWebPlaybackSDKReady = () => resolve();
+        });
+      }
+
+      // Check if user has Spotify Premium (required for Web Playback SDK)
+      try {
+        const authResponse = await fetch('/api/spotify/profile');
+        if (!authResponse.ok) return;
+
+        const authData = await authResponse.json();
+        if (authData.product !== 'premium') {
+          console.log('Spotify Premium required for playback controls');
+          return;
+        }
+
+        // Get access token
+        const tokenResponse = await fetch('/api/spotify/auth');
+        if (!tokenResponse.ok) return;
+        
+        const { access_token } = await tokenResponse.json();
+        
+        // Initialize player
+        const player = new window.Spotify.Player({
+          name: 'Atharva\'s Portfolio Player',
+          getOAuthToken: (cb: (token: string) => void) => cb(access_token),
+          volume: 0.7
+        });
+
+        // Set up event listeners
+        player.addListener('ready', ({ device_id }: { device_id: string }) => {
+          console.log('Ready with Device ID', device_id);
+          setDeviceId(device_id);
+          setIsSpotifyReady(true);
+        });
+
+        player.addListener('not_ready', ({ device_id }: { device_id: string }) => {
+          console.log('Device ID has gone offline', device_id);
+          setIsSpotifyReady(false);
+        });
+
+        player.addListener('player_state_changed', (state: SpotifyPlaybackState | null) => {
+          if (state) {
+            setCurrentPlayback(state);
+          }
+        });
+
+        // Connect to the player
+        await player.connect();
+        playerRef.current = player;
+
+      } catch (error) {
+        console.log('Spotify playback initialization failed:', error);
+      }
+    };
+
+    if (profile) {
+      initializeSpotifyPlayer();
+    }
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.disconnect();
+      }
+    };
+  }, [profile]);
+
+  // Spotify playback controls
+  const playTrackOnSpotify = async (trackUri: string) => {
+    if (!deviceId || !isSpotifyReady) {
+      // Fallback to opening in Spotify app
+      const spotifyUrl = trackUri.replace('spotify:track:', 'https://open.spotify.com/track/');
+      window.open(spotifyUrl, '_blank');
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await getAccessToken()}`,
+        },
+        body: JSON.stringify({
+          uris: [trackUri],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to play track');
+      }
+    } catch (error) {
+      console.error('Error playing track:', error);
+      // Fallback to opening in Spotify
+      const spotifyUrl = trackUri.replace('spotify:track:', 'https://open.spotify.com/track/');
+      window.open(spotifyUrl, '_blank');
+    }
+  };
+
+  const getAccessToken = async (): Promise<string> => {
+    const response = await fetch('/api/spotify/auth');
+    const data = await response.json();
+    return data.access_token;
+  };
+
+  const togglePlayback = async () => {
+    if (!playerRef.current) return;
+    
+    try {
+      await playerRef.current.togglePlay();
+    } catch (error) {
+      console.error('Error toggling playback:', error);
+    }
+  };
+
+  const skipToNext = async () => {
+    if (!playerRef.current) return;
+    
+    try {
+      await playerRef.current.nextTrack();
+    } catch (error) {
+      console.error('Error skipping to next track:', error);
+    }
+  };
+
+  const skipToPrevious = async () => {
+    if (!playerRef.current) return;
+    
+    try {
+      await playerRef.current.previousTrack();
+    } catch (error) {
+      console.error('Error skipping to previous track:', error);
+    }
+  };
+
+  // Enhanced play function that tries Spotify first, then preview
+  const handlePlayTrack = async (track: Track) => {
+    // Try Spotify playback first
+    if (isSpotifyReady && deviceId) {
+      const trackUri = `spotify:track:${track.id}`;
+      await playTrackOnSpotify(trackUri);
+    } else {
+      // Fallback to preview playback
+      handlePlayPreview(track);
+    }
+  };
+
   // Cleanup audio on unmount
   useEffect(() => {
     return () => {
@@ -187,6 +405,78 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         </Text>
       </Column>
 
+      {/* Spotify Playback Controls (if connected) */}
+      {isSpotifyReady && currentPlayback && (
+        <Card
+          fillWidth
+          padding="20"
+          radius="l"
+          border="brand-alpha-weak"
+          background="brand-alpha-weak"
+          className={styles.playbackControls}
+        >
+          <Column fillWidth gap="16">
+            <Row fillWidth gap="12" vertical="center">
+              <div className={styles.currentTrackCover}>
+                <img
+                  src={currentPlayback.track_window.current_track.album.images[0]?.url}
+                  alt="Currently playing"
+                  className={styles.currentTrackImage}
+                />
+              </div>
+              <Column flex={1} gap="4">
+                <Text variant="body-strong-m" className={styles.currentTrackName}>
+                  {currentPlayback.track_window.current_track.name}
+                </Text>
+                <Text variant="body-default-s" onBackground="neutral-weak">
+                  {currentPlayback.track_window.current_track.artists.map(a => a.name).join(', ')}
+                </Text>
+              </Column>
+              <Row gap="8" vertical="center">
+                <Button
+                  variant="tertiary"
+                  size="s"
+                  onClick={skipToPrevious}
+                  aria-label="Previous track"
+                >
+                  <FaStepBackward />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="m"
+                  onClick={togglePlayback}
+                  aria-label={currentPlayback.is_playing ? "Pause" : "Play"}
+                >
+                  {currentPlayback.is_playing ? <FaPause /> : <FaPlay />}
+                </Button>
+                <Button
+                  variant="tertiary"
+                  size="s"
+                  onClick={skipToNext}
+                  aria-label="Next track"
+                >
+                  <FaStepForward />
+                </Button>
+              </Row>
+            </Row>
+            <Row fillWidth horizontal="center">
+              <Text variant="label-default-s" onBackground="brand-weak">
+                ♪ Playing on Spotify • Full playback control available
+              </Text>
+            </Row>
+          </Column>
+        </Card>
+      )}
+
+      {/* Status indicator for Spotify connection */}
+      {profile && !isSpotifyReady && (
+        <Row fillWidth horizontal="center">
+          <Text variant="label-default-s" onBackground="neutral-weak">
+            💡 Spotify Premium required for full playback control • Preview mode active
+          </Text>
+        </Row>
+      )}
+
       {/* Tracks Grid */}
       <Column fillWidth gap="16">
         {tracks.slice(0, 6).map((track) => (
@@ -208,12 +498,25 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                 />
                 <button
                   type="button"
-                  className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''}`}
-                  onClick={() => handlePlayPreview(track)}
-                  aria-label={currentPlaying === track.id ? 'Pause' : track.preview_url ? 'Play preview' : 'Open in Spotify'}
+                  className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''} ${isSpotifyReady ? styles.fullPlayback : ''}`}
+                  onClick={() => handlePlayTrack(track)}
+                  aria-label={
+                    currentPlaying === track.id ? 'Pause' : 
+                    isSpotifyReady ? 'Play on Spotify' :
+                    track.preview_url ? 'Play preview' : 'Open in Spotify'
+                  }
+                  title={
+                    isSpotifyReady ? 'Play full track on Spotify' :
+                    track.preview_url ? '30-second preview' : 'Open in Spotify app'
+                  }
                 >
                   {currentPlaying === track.id ? (
                     <FaPause />
+                  ) : isSpotifyReady ? (
+                    <Row gap="4" vertical="center">
+                      <FaPlay />
+                      {deviceId && <span className={styles.spotifyIndicator}>♪</span>}
+                    </Row>
                   ) : track.preview_url ? (
                     <FaPlay />
                   ) : (
