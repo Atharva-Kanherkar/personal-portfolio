@@ -162,7 +162,14 @@ export default function SpotifyAnalytics() {
   };
 
   const openInSpotify = (url: string) => {
-    window.open(url, '_blank');
+    console.log('Opening Spotify URL:', url);
+    if (url?.startsWith('http')) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('Invalid Spotify URL:', url);
+      // Fallback: search for the track on Spotify web
+      window.open('https://open.spotify.com/', '_blank', 'noopener,noreferrer');
+    }
   };
 
   const formatDuration = (ms: number) => {
@@ -374,18 +381,20 @@ export default function SpotifyAnalytics() {
       )}
 
       {/* Top Tracks */}
-      <Card padding="24" radius="l" background="surface">
-        <Column gap="16">
-          <Heading variant="heading-strong-l">My Top Tracks</Heading>
-          <Column gap="8">
-            {tracks.slice(0, 10).map((track, index) => (
-              <Card 
-                key={track.id} 
-                padding="16" 
-                radius="m" 
-                background="neutral-alpha-weak"
-                className={styles.trackRow}
-              >
+      <Column fillWidth horizontal="center">
+        <Card padding="24" radius="l" background="surface" fillWidth>
+          <Column gap="16" horizontal="center">
+            <Heading variant="heading-strong-l">My Top Tracks</Heading>
+            <Column gap="8" fillWidth>
+              {tracks.slice(0, 10).map((track, index) => (
+                <Card 
+                  key={track.id} 
+                  padding="16" 
+                  radius="m" 
+                  background="neutral-alpha-weak"
+                  className={styles.trackRow}
+                  fillWidth
+                >
                 <Row gap="16" vertical="center">
                   <Text variant="body-strong-s" style={{ minWidth: '24px' }}>
                     #{index + 1}
@@ -446,7 +455,8 @@ export default function SpotifyAnalytics() {
             ))}
           </Column>
         </Column>
-      </Card>
+        </Card>
+      </Column>
 
       {/* Top Artists */}
       <Card padding="24" radius="l" background="surface">

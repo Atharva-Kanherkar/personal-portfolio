@@ -107,36 +107,24 @@
   }
 }
 
-/* Desktop-specific optimizations */
-@media (min-width: 1024px) {
-  .artistCard {
-    width: 130px;
-    min-width: 130px;
-    
-    img {
-      width: 50px !important;
-      height: 50px !important;
-    }
+/* Desktop optimizations - Center tracks better */
+@media (min-width: 769px) {
+  .trackRow {
+    max-width: 800px;
+    margin: 8px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   
-  .trackRow {
-    padding: 10px 16px;
-    margin: 3px 0;
-    
-    img {
-      width: 36px !important;
-      height: 36px !important;
-    }
+  .artistCard {
+    width: 180px;
+    height: 220px;
   }
   
   .timeRangeSelector {
-    max-width: 350px;
-    gap: 6px;
-    
-    .button {
-      min-width: 80px;
-      padding: 8px 16px;
-    }
+    max-width: 400px;
+    margin: 0 auto;
   }
 }
 
