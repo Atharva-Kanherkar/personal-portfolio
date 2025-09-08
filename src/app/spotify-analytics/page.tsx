@@ -197,35 +197,36 @@ export default function SpotifyAnalytics() {
   }
 
   return (
-    <Column fillWidth gap="xl" paddingY="24" paddingX="24">
-      {/* Header */}
-      <Column fillWidth gap="16" horizontal="center">
-        <Row gap="12" vertical="center">
-          <Button onClick={() => { window.location.href = '/'; }} variant="tertiary" size="s">
-            <FaArrowLeft />
-          </Button>
-          <FaSpotify size={32} color="#1DB954" />
-          <Heading variant="heading-strong-xl">Spotify Analytics</Heading>
-        </Row>
-        <Text variant="body-default-l" onBackground="neutral-weak">
-          Deep dive into your music listening patterns and preferences
-        </Text>
-      </Column>
+    <Column fillWidth gap="xl" paddingY="24" horizontal="center">
+      <Column maxWidth="l" fillWidth gap="xl" paddingX="24">
+        {/* Header */}
+        <Column fillWidth gap="16" horizontal="center">
+          <Row gap="12" vertical="center" horizontal="center">
+            <Button onClick={() => { window.location.href = '/'; }} variant="tertiary" size="s">
+              <FaArrowLeft />
+            </Button>
+            <FaSpotify size={32} color="#1DB954" />
+            <Heading variant="heading-strong-xl">Spotify Analytics</Heading>
+          </Row>
+          <Text variant="body-default-l" onBackground="neutral-weak">
+            Deep dive into your music listening patterns and preferences
+          </Text>
+        </Column>
 
-      {/* Time Range Selector */}
-      <Row fillWidth horizontal="center" gap="8" className={styles.timeRangeSelector}>
-        {timeRanges.map((range) => (
-          <Button
-            key={range.value}
-            onClick={() => setSelectedTimeRange(range.value)}
-            variant={selectedTimeRange === range.value ? "primary" : "secondary"}
-            size="m"
-            className="button"
-          >
-            {range.label}
-          </Button>
-        ))}
-      </Row>
+        {/* Time Range Selector */}
+        <Row fillWidth horizontal="center" gap="8" className={styles.timeRangeSelector}>
+          {timeRanges.map((range) => (
+            <Button
+              key={range.value}
+              onClick={() => setSelectedTimeRange(range.value)}
+              variant={selectedTimeRange === range.value ? "primary" : "secondary"}
+              size="m"
+              className="button"
+            >
+              {range.label}
+            </Button>
+          ))}
+        </Row>
 
       {/* Stats Overview */}
       <Column fillWidth gap="16">
@@ -433,6 +434,7 @@ export default function SpotifyAnalytics() {
           </Row>
         </Column>
       </Card>
+      </Column>
     </Column>
   );
 }

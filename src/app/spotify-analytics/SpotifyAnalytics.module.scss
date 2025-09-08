@@ -1,6 +1,20 @@
+// Spotify Analytics Styles - Centered and Aesthetic Design
+
 .timeRangeSelector {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 auto;
+  
   .button {
     min-width: 100px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+    }
   }
 }
 
@@ -10,33 +24,36 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   overflow: hidden;
+  margin: 4px 0;
 }
 
 .progressFill {
   height: 100%;
+  background: linear-gradient(90deg, #1DB954, #1ed760);
   transition: width 0.3s ease;
   border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
 }
 
 .trackRow {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
   
   &:hover {
-    background-color: rgba(29, 185, 84, 0.05);
-    transform: translateY(-1px);
-  }
-}
-
-.artistCard {
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.08), rgba(29, 185, 84, 0.04));
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(29, 185, 84, 0.2);
+    border-color: rgba(29, 185, 84, 0.3);
   }
   
   img {
-    transition: transform 0.2s ease;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
   }
   
   &:hover img {
@@ -44,21 +61,76 @@
   }
 }
 
+.artistCard {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(29, 185, 84, 0.25);
+    border-color: rgba(29, 185, 84, 0.4);
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(29, 185, 84, 0.05));
+  }
+  
+  img {
+    transition: transform 0.3s ease;
+    border-radius: 50%;
+  }
+  
+  &:hover img {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .timeRangeSelector {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    max-width: 300px;
+    margin: 0 auto;
     
     .button {
       width: 100%;
+      min-width: unset;
     }
   }
   
   .trackRow {
-    flex-direction: column;
+    flex-direction: column !important;
     text-align: center;
-    gap: 12px;
+    gap: 16px;
+    padding: 20px;
+    
+    img {
+      width: 100px !important;
+      height: 100px !important;
+      margin: 0 auto;
+    }
+    
+    &:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+  }
+  
+  .artistCard {
+    min-width: 180px !important;
+    margin: 0 auto;
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .trackRow {
+    margin: 6px 0;
+    padding: 16px;
     
     img {
       width: 80px !important;
@@ -67,21 +139,58 @@
   }
   
   .artistCard {
-    min-width: 150px !important;
+    min-width: 160px !important;
   }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .progressBar {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.3);
   }
   
-  .trackRow:hover {
-    background-color: rgba(29, 185, 84, 0.1);
+  .trackRow {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.05);
+    
+    &:hover {
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.15), rgba(29, 185, 84, 0.08));
+      border-color: rgba(29, 185, 84, 0.4);
+    }
   }
   
-  .artistCard:hover {
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+  .artistCard {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.08);
+    
+    &:hover {
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.2), rgba(29, 185, 84, 0.1));
+      box-shadow: 0 20px 40px rgba(29, 185, 84, 0.3);
+    }
   }
+}
+
+/* Custom animations for enhanced aesthetics */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.trackRow:nth-child(odd) {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.trackRow:nth-child(even) {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.artistCard:hover {
+  animation: pulse 2s ease-in-out infinite;
 }
