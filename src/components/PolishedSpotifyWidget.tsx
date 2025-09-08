@@ -146,18 +146,22 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
 
       if (tracksResponse.ok) {
         const tracksData = await tracksResponse.json();
+        console.log('Spotify tracks data:', tracksData); // Debug log
         if (tracksData.tracks && tracksData.tracks.length > 0) {
+          console.log('First track preview_url:', tracksData.tracks[0].preview_url); // Debug log
           setTracks(tracksData.tracks);
         } else {
           setTracks(demoTracks);
         }
       } else {
+        console.log('Tracks response not ok:', tracksResponse.status);
         setTracks(demoTracks);
         setError('Using demo tracks');
       }
 
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
+        console.log('Spotify profile data:', profileData); // Debug log
         setProfile(profileData);
       }
     } catch (err) {
@@ -170,19 +174,24 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
   };
 
   const handlePlayPreview = (track: Track) => {
-    if (!track.preview_url) {
+    console.log('handlePlayPreview called for track:', track.name, 'preview_url:', track.preview_url);
+    
+    if (!track.preview_url || track.preview_url === null || track.preview_url.trim() === '') {
+      console.log('No preview URL available, opening in Spotify');
       // Open in Spotify if no preview
       window.open(track.external_url, '_blank');
       return;
     }
 
     if (currentPlaying === track.id) {
+      console.log('Pausing current track');
       // Pause current track
       if (audioRef.current) {
         audioRef.current.pause();
       }
       setCurrentPlaying(null);
     } else {
+      console.log('Playing new track preview:', track.preview_url);
       // Stop current track if playing
       if (audioRef.current) {
         audioRef.current.pause();
@@ -193,15 +202,18 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
       audioRef.current.volume = 0.7;
       
       audioRef.current.play().then(() => {
+        console.log('Audio started playing successfully');
         setCurrentPlaying(track.id);
       }).catch((error) => {
         console.error('Audio play error:', error);
         // Fallback to opening Spotify
+        alert(`Preview unavailable. Error: ${error.message}. Opening in Spotify...`);
         window.open(track.external_url, '_blank');
       });
       
       // Reset when track ends
       audioRef.current.onended = () => {
+        console.log('Track preview ended');
         setCurrentPlaying(null);
       };
     }
@@ -498,25 +510,18 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                 />
                 <button
                   type="button"
-                  className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''} ${isSpotifyReady ? styles.fullPlayback : ''}`}
-                  onClick={() => handlePlayTrack(track)}
+                  className={`${styles.playButton} ${currentPlaying === track.id ? styles.playing : ''}`}
+                  onClick={() => handlePlayPreview(track)}
                   aria-label={
                     currentPlaying === track.id ? 'Pause' : 
-                    isSpotifyReady ? 'Play on Spotify' :
-                    track.preview_url ? 'Play preview' : 'Open in Spotify'
+                    track.preview_url ? 'Play 30s preview' : 'Open in Spotify'
                   }
                   title={
-                    isSpotifyReady ? 'Play full track on Spotify' :
                     track.preview_url ? '30-second preview' : 'Open in Spotify app'
                   }
                 >
                   {currentPlaying === track.id ? (
                     <FaPause />
-                  ) : isSpotifyReady ? (
-                    <Row gap="4" vertical="center">
-                      <FaPlay />
-                      {deviceId && <span className={styles.spotifyIndicator}>♪</span>}
-                    </Row>
                   ) : track.preview_url ? (
                     <FaPlay />
                   ) : (
