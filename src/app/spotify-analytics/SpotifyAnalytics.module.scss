@@ -1,21 +1,200 @@
-// Spotify Analytics Styles - Optimized Desktop Layout
+// EXACT COPY FROM HOME PAGE SPOTIFY WIDGET STYLING
 
 .timeRangeSelector {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin: 0 auto;
-  max-width: 400px;
   
   .button {
-    min-width: 90px;
+    min-width: 100px;
     transition: all 0.3s ease;
     
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
     }
+  }
+}
+
+/* EXACT COPY - Tabs Styling from Home Page */
+.tabsContainer {
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.tabButton {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+  
+  &.activeTab {
+    background: rgba(29, 185, 84, 1) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+  }
+}
+
+/* EXACT COPY - Track Cards from Home Page */
+.trackCard {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.albumCover {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.albumImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(29, 185, 84, 0.9);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+  
+  &:hover {
+    background: rgba(29, 185, 84, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.albumCover:hover .playButton {
+  opacity: 1;
+}
+
+.trackName {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* EXACT COPY - Artist Cards from Home Page */
+.artistCard {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  img {
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+/* Progress bars for Music DNA */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #1DB954, #1ed760);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .timeRangeSelector {
+    flex-direction: column;
+    align-items: center;
+    max-width: 300px;
+    margin: 0 auto;
+    
+    .button {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+  
+  .tabsContainer {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .tabButton {
+      width: 100%;
+    }
+  }
+  
+  .trackCard {
+    padding: 16px;
+    
+    .albumCover {
+      width: 60px;
+      height: 60px;
+    }
+  }
+  
+  .artistCard {
+    min-width: 160px;
+    margin: 0 auto;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tabsContainer {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .progressBar {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .trackCard:hover {
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+  }
+  
+  .artistCard:hover {
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
   }
 }
 
