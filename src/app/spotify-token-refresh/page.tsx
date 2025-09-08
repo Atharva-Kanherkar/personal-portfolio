@@ -90,10 +90,10 @@ export default function SpotifyTokenRefresh() {
               After authorizing, you'll be redirected to a page showing your authorization code. Copy and paste it here:
             </Text>
             <Input
+              id="auth-code"
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value)}
               placeholder="Paste your authorization code here..."
-              size="m"
             />
             <Button 
               onClick={exchangeCodeForTokens} 
