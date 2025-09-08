@@ -11,14 +11,29 @@ export function Projects({ range, exclude }: ProjectsProps) {
   let allProjects = getPosts(["src", "app", "work", "projects"]);
 
   // Exclude by slug (exact match)
-  if (exclude && exclude.length > 0) {
+    if (exclude && exclude.length > 0) {
     allProjects = allProjects.filter((post) => !exclude.includes(post.slug));
   }
+  const customOrder = ["redlead", "workflows4s", "lfxomp", "chainarena"];
 
-  const sortedProjects = allProjects.sort((a, b) => {
+  
+ const sortedProjects = allProjects.sort((a, b) => {
+    const indexA = customOrder.indexOf(a.slug);
+    const indexB = customOrder.indexOf(b.slug);
+    
+    // If both projects are in the custom order, sort by that order
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+    
+    // If only one is in custom order, prioritize it
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    
+    // If neither is in custom order, fall back to date sorting
     return new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime();
   });
-
+  
   const displayedProjects = range
     ? sortedProjects.slice(range[0] - 1, range[1] ?? sortedProjects.length)
     : sortedProjects;

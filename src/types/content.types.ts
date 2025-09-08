@@ -213,7 +213,22 @@ export interface About extends BasePageConfig {
  * Blog page configuration.
  * @description Configuration for the Blog page, including metadata and navigation label.
  */
-export interface Blog extends BasePageConfig {}
+ export interface Blog extends BasePageConfig {
+  /** Blog categories configuration */
+  categories?: {
+    /** Whether to display categories */
+    display: boolean;
+    /** List of available categories */
+    list: Array<{
+      /** Category name */
+      name: string;
+      /** Category slug for filtering */
+      slug: string;
+      /** Category description */
+      description?: string;
+    }>;
+  };
+}
 
 /**
  * Work/projects page configuration.

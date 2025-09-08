@@ -1,0 +1,80 @@
+.trackCard {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgba(29, 185, 84, 0.3);
+  }
+}
+
+.albumCover {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.albumImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(29, 185, 84, 0.9);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+  
+  &:hover {
+    background: rgba(29, 185, 84, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.albumCover:hover .playButton {
+  opacity: 1;
+}
+
+.trackName {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .trackCard {
+    padding: 16px;
+  }
+  
+  .albumCover {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .playButton {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .trackName {
+    max-width: 200px;
+  }
+}

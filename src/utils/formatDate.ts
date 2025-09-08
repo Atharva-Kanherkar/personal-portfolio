@@ -1,9 +1,10 @@
 export function formatDate(date: string, includeRelative = false) {
   const currentDate = new Date();
 
-  if (!date.includes("T")) {
-    date = `${date}T00:00:00`;
+   if (!date) {
+    return ;
   }
+
 
   const targetDate = new Date(date);
   const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();

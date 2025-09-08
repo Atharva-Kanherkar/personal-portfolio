@@ -12,7 +12,7 @@
   Line,
 } from "@once-ui-system/core";
 import { home, about, person, baseURL, routes } from "@/resources";
-import { Mailchimp } from "@/components";
+import { Mailchimp, SpotifyWidget } from "@/components";
 import { Projects } from "@/components/work/Projects";
 import { Posts } from "@/components/blog/Posts";
 import { Terminal } from "@/components/Terminal";
@@ -114,7 +114,7 @@ export default function Home() {
       
       {/* Show only RedLead project by filtering by slug */}
       <RevealFx translateY="16" delay={1.0}>
-        <Projects range={[1, 10]} exclude={["chainarena"]} />
+        <Projects range={[1, 10]} exclude={["chainarena", "workflows4s", "lfxomp"]} />
       </RevealFx>
       
       {/* Blog section */}
@@ -138,6 +138,19 @@ export default function Home() {
           </Row>
         </Column>
       )}
+      
+      {/* Spotify Widget Section */}
+      <RevealFx translateY="16" delay={0.4} fillWidth>
+        <Column fillWidth gap="24" marginBottom="xl">
+          <Row fillWidth paddingRight="64">
+            <Line maxWidth={48} />
+          </Row>
+          <SpotifyWidget />
+          <Row fillWidth paddingLeft="64" horizontal="end">
+            <Line maxWidth={48} />
+          </Row>
+        </Column>
+      </RevealFx>
       
       <Mailchimp />
     </Column>

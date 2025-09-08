@@ -13,8 +13,7 @@ import {
 } from "@/types";
 import { home } from "./index";
 
-// IMPORTANT: Replace with your own domain address - it's used for SEO in meta tags and schema
-const baseURL: string = "https://demo.magic-portfolio.com";
+ const baseURL: string = "https://attharrva15.tech";
 
 const routes: RoutesConfig = {
   "/": true,
@@ -22,6 +21,7 @@ const routes: RoutesConfig = {
   "/work": true,
   "/blog": true,
   "/gallery": false,
+  "/spotify-setup": true,
 };
 
 const display: DisplayConfig = {
@@ -186,12 +186,12 @@ const mailchimp: MailchimpConfig = {
 };
 
 // default schema data
-const schema: SchemaConfig = {
+ const schema: SchemaConfig = {
   logo: "",
-  type: "Organization",
-  name: "Once UI",
+  type: "Person", // Change from "Organization" to "Person"
+  name: "Atharva Kanherkar", // Change from "Once UI"
   description: home.description,
-  email: "lorant@once-ui.com",
+  email: "atharvakanherkar25@gmail.com", // Change from template email
 };
 
 // social links

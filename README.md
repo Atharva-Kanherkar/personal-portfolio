@@ -68,6 +68,27 @@ Docs available at: [docs.once-ui.com](https://docs.once-ui.com/docs/magic-portfo
 - A localized, earlier version of Magic Portfolio is available with the next-intl library
 - To use localization, switch to the 'i18n' branch
 
+## Spotify Integration 🎵
+
+This portfolio includes a Spotify integration that displays your favorite tracks at the bottom of the homepage. 
+
+### Quick Setup
+
+1. **Visit the setup page**: Go to `/spotify-setup` on your local development server
+2. **Follow the guided setup**: The page will walk you through creating a Spotify app and getting your credentials
+3. **Add environment variables**: Create a `.env.local` file with your Spotify credentials
+4. **Restart your server**: Your favorite tracks will appear on the homepage!
+
+For detailed setup instructions, see [SPOTIFY_SETUP.md](SPOTIFY_SETUP.md).
+
+### Features
+
+- 🎵 **Top Tracks Display**: Shows your most-played tracks from Spotify
+- 🎧 **Audio Previews**: Click to play 30-second previews (when available)
+- 🔗 **Direct Links**: Open tracks directly in Spotify
+- 📱 **Responsive Design**: Works beautifully on all devices
+- 🎨 **Styled to Match**: Seamlessly integrates with your portfolio theme
+
 ## Creators
 
 Lorant One: [Threads](https://www.threads.net/@lorant.one) / [LinkedIn](https://www.linkedin.com/in/lorant-one/)

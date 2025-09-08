@@ -58,12 +58,14 @@ const home: Home = {
         </Text>
       </Row>
     ),
-    href: "/work/building-once-ui-a-customizable-design-system", // This is template content
+    href: "",
   },
   subline: (
     <>
-      I'm Atharva, a backend engineer passionate about building scalable systems, 
-      contributing to open source, and exploring distributed architectures.
+        I'm Atharva, a backend engineer passionate about building scalable systems, 
+      contributing to open source, and exploring distributed architectures. Beyond tech, 
+      I find inspiration in literature, philosophy, and hip hop culture — interests that 
+      shape my perspective on problem-solving and creativity.
     </>
   ),
 };
@@ -114,9 +116,25 @@ const about: About = {
       ],
       images: [],
     },
+      {
+      company: "Google Summer of Code – Workflows4s",
+      timeframe: "May 2025 – Aug 2025",
+      role: "Open Source Developer",
+      achievements: [
+        <>
+          Developing a web UI for inspecting workflow details in Workflows4s 
+          using Scala.js, Tapir, and Scala HTTP server technologies.
+        </>,
+        <>
+          Implementing features such as state inspection, timeline visualization, 
+          and real-time workflow updates.
+        </>,
+      ],
+      images: [],
+    },
     {
       company: "Linux Foundation – Open Mainframe Project (Zowe)",
-      timeframe: "Jan 2025 – Apr 2025",
+      timeframe: "May 2024 – Aug 2024",
       role: "LFX Mentorship Program Developer",
       achievements: [
         <>
@@ -146,22 +164,7 @@ const about: About = {
       ],
       images: [],
     },
-    {
-      company: "Google Summer of Code – Workflows4s",
-      timeframe: "May 2025 – Aug 2025",
-      role: "Open Source Developer",
-      achievements: [
-        <>
-          Developing a web UI for inspecting workflow details in Workflows4s 
-          using Scala.js, Tapir, and Scala HTTP server technologies.
-        </>,
-        <>
-          Implementing features such as state inspection, timeline visualization, 
-          and real-time workflow updates.
-        </>,
-      ],
-      images: [],
-    },
+  
     {
       company: "Typelevel",
       timeframe: "2025 – Present",
@@ -255,15 +258,39 @@ technical: {
 
 };
 
+ // ...existing code...
 const blog: Blog = {
   path: "/blog",
   label: "Blog",
-  title: "Crafting scalable backends and tinkering with distributed systems...",
-  description: `Read what ${person.name} has been up to recently`,
-  // Create new blog posts by adding a new .mdx file to app/blog/posts
-  // All posts will be listed on the /blog route
+  title: "Crafting scalable backends and exploring life",
+  description: `Read what ${person.name} has been up to recently - from tech insights to literary reflections`,
+  categories: {
+    display: true,
+    list: [
+      {
+        name: "Technology",
+        slug: "tech",
+        description: "Backend engineering, distributed systems, and open source"
+      },
+      {
+        name: "Literature",
+        slug: "literature", 
+        description: "Book reviews, literary analysis, and reading reflections"
+      },
+      {
+        name: "Philosophy",
+        slug: "philosophy",
+        description: "Philosophical thoughts and existential musings"
+      },
+      {
+        name: "Hip Hop",
+        slug: "hiphop",
+        description: "Hip hop culture, music analysis, and artistic expression"
+      }
+    ]
+  }
 };
-
+ 
 const work: Work = {
   path: "/work",
   label: "Work",

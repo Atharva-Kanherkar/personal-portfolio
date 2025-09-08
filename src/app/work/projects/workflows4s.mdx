@@ -1,0 +1,71 @@
+---
+title: "Workflows4s – Developer-Friendly Workflow Visualization"
+publishedAt: "2025-08-01"
+summary: "Workflows4s provides a minimal UI and API for interactive workflow visualization, runtime introspection, and simplified deployment for developers."
+images:
+  - "/images/projects/workflows4s/cover.png"
+team:
+  - name: "Atharva Kanherkar"
+    role: "GSoC Contributor"
+    avatar: "/images/avatar.png"
+    linkedIn: "https://www.linkedin.com/in/atharvakanherkar"
+link: "https://github.com/business4s/workflows4s"
+---
+
+## Overview
+
+**Workflows4s** is a Scala-based project designed to provide developers with an interactive and intuitive interface for visualizing workflows and monitoring their execution in real time.  
+The project includes a reactive frontend built with Scala.js and Tyrian, a type-safe backend API using Tapir, and automated deployment through Docker and Fly.io.
+
+---
+
+## Features
+
+- **Reactive Frontend**: A Tyrian-based Scala.js UI following the Model-View-Update architecture for predictable state management.  
+- **Type-Safe API**: Tapir endpoints enforce client-server contract consistency and generate OpenAPI documentation.  
+- **Workflow Visualization**: Execution traces are converted into interactive Mermaid.js diagrams rendered in the browser.  
+- **Automated Deployment**: Full CI/CD pipeline with GitHub Actions for building Docker images and deploying to Fly.io.  
+
+---
+
+## How It Works
+
+1. **Frontend Interaction**: Users interact with the Tyrian UI in the browser to view workflow instances.  
+2. **API Requests**: The UI sends type-safe HTTP requests to the Tapir API server.  
+3. **Data Processing**: The server executes workflow logic, providing instance data and execution traces.  
+4. **Visualization**: Scala.js transforms the data into Mermaid syntax, which is rendered as SVG diagrams in the browser.  
+5. **Deployment**: The backend server serves both API endpoints and static frontend assets from a single Docker container on Fly.io.  
+
+---
+
+ 
+
+## Pull Requests
+
+- PR #151 — feat(api and ui): Visualisations — Open — [View PR](https://github.com/business4s/workflows4s/pull/151)
+- PR #133 — Add Fly.io Deployment & CI/CD — Merged — [View PR](https://github.com/business4s/workflows4s/pull/133)
+- PR #119 — Refactor UI + Bulma Integration — Merged — [View PR](https://github.com/business4s/workflows4s/pull/119)
+- PR #114 — JSON Viewer & Simplified Models — Merged — [View PR](https://github.com/business4s/workflows4s/pull/114)
+- PR #108 — Add Web API Module (Tapir) — Merged — [View PR](https://github.com/business4s/workflows4s/pull/108)
+- PR #106 — Tyrian-based UI Scaffolding — Merged — [View PR](https://github.com/business4s/workflows4s/pull/106)
+- PR #104 — Course Registration Workflow Example — Merged — [View PR](https://github.com/business4s/workflows4s/pull/104)
+- PR #103 — Gitignore Updates — Merged — [View PR](https://github.com/business4s/workflows4s/pull/103)
+
+---
+
+## Tech Stack
+
+- **Frontend**: Scala.js + Tyrian + Bulma  
+- **Backend**: Scala JVM + Tapir + workflows4s-core  
+- **Visualization**: Mermaid.js  
+- **Infra**: Docker + Fly.io + GitHub Actions  
+
+---
+
+## Highlights
+
+- Built a fully functional, type-safe full-stack solution for workflow visualization.  
+- Implemented a reactive UI that allows developers to inspect workflow state and execution progress.  
+- Dockerized the application and created a CI/CD pipeline for automated deployment.  
+- Contributed all features through well-documented pull requests during GSoC 2025.  
+ 
