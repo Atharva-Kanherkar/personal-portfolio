@@ -21,7 +21,8 @@ interface AudioFeatures {
   valence: number;
   acousticness: number;
   instrumentalness: number;
-  tempo: number;
+  speechiness: number;
+  tempo?: number;
 }
 
 interface TrackWithFeatures {
@@ -108,7 +109,6 @@ export default function SpotifyAnalytics() {
 
       if (statsRes.ok) {
         statsData = await statsRes.json();
-        console.log('Stats data received:', statsData); // Debug log
       } else {
         console.warn('Failed to fetch stats data:', statsRes.status);
       }
@@ -122,7 +122,6 @@ export default function SpotifyAnalytics() {
       setArtists(artistsData.artists || []);
       // Fix: API returns { stats: ListeningStats }
       setStats(statsData?.stats || null);
-      console.log('Stats set to:', statsData?.stats || null); // Debug log
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
     } finally {
@@ -434,101 +433,119 @@ export default function SpotifyAnalytics() {
         }
 
         {/* Stats Tab */}
-        {activeTab === 'stats' && stats && (
-          <Column fillWidth gap="20">
-            {/* Stats Overview */}
-            <Row fillWidth gap="16" wrap>
-              <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
-                <Column gap="8" horizontal="center">
-                  <FaMusic color="#1DB954" size={24} />
-                  <Text variant="heading-strong-l">{stats.total_tracks}</Text>
-                  <Text variant="body-default-s" onBackground="neutral-weak">Top Tracks</Text>
-                </Column>
-              </Card>
-              <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
-                <Column gap="8" horizontal="center">
-                  <FaUsers color="#1DB954" size={24} />
-                  <Text variant="heading-strong-l">{stats.total_artists}</Text>
-                  <Text variant="body-default-s" onBackground="neutral-weak">Artists</Text>
-                </Column>
-              </Card>
-              <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
-                <Column gap="8" horizontal="center">
-                  <FaClock color="#1DB954" size={24} />
-                  <Text variant="heading-strong-l">{formatListeningTime(stats.total_listening_time_ms)}</Text>
-                  <Text variant="body-default-s" onBackground="neutral-weak">Total Time</Text>
-                </Column>
-              </Card>
-              <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
-                <Column gap="8" horizontal="center">
-                  <FaHeadphones color="#1DB954" size={24} />
-                  <Text variant="heading-strong-l">{stats.unique_genres}</Text>
-                  <Text variant="body-default-s" onBackground="neutral-weak">Genres</Text>
-                </Column>
-              </Card>
-            </Row>
+        {activeTab === 'stats' && (
+          stats ? (
+            <Column fillWidth gap="20">
+              {/* Stats Overview */}
+              <Row fillWidth gap="16" wrap>
+                <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
+                  <Column gap="8" horizontal="center">
+                    <FaMusic color="#1DB954" size={24} />
+                    <Text variant="heading-strong-l">{stats.total_tracks}</Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">Top Tracks</Text>
+                  </Column>
+                </Card>
+                <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
+                  <Column gap="8" horizontal="center">
+                    <FaUsers color="#1DB954" size={24} />
+                    <Text variant="heading-strong-l">{stats.total_artists}</Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">Artists</Text>
+                  </Column>
+                </Card>
+                <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
+                  <Column gap="8" horizontal="center">
+                    <FaClock color="#1DB954" size={24} />
+                    <Text variant="heading-strong-l">{formatListeningTime(stats.total_listening_time_ms)}</Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">Total Time</Text>
+                  </Column>
+                </Card>
+                <Card flex={1} padding="20" radius="l" background="surface" minWidth={180} border="neutral-alpha-weak">
+                  <Column gap="8" horizontal="center">
+                    <FaHeadphones color="#1DB954" size={24} />
+                    <Text variant="heading-strong-l">{stats.unique_genres}</Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">Genres</Text>
+                  </Column>
+                </Card>
+              </Row>
 
-            {/* Top Genres */}
-            {stats.top_genres.length > 0 && (
-              <Card padding="20" radius="l" background="surface" border="neutral-alpha-weak">
-                <Column gap="16">
-                  <Heading variant="heading-strong-m">Top Genres</Heading>
-                  <Row fillWidth gap="12" wrap>
-                    {stats.top_genres.slice(0, 8).map((genre, index) => (
-                      <Card key={genre.genre} padding="12" radius="m" background="neutral-alpha-weak">
-                        <Row gap="8" vertical="center">
-                          <Text variant="body-strong-s">{genre.genre}</Text>
-                          <Text variant="body-default-xs" onBackground="neutral-weak">
-                            ({genre.count})
-                          </Text>
-                        </Row>
-                      </Card>
-                    ))}
-                  </Row>
-                </Column>
-              </Card>
-            )}
-          </Column>
+              {/* Top Genres */}
+              {stats.top_genres.length > 0 && (
+                <Card padding="20" radius="l" background="surface" border="neutral-alpha-weak">
+                  <Column gap="16">
+                    <Heading variant="heading-strong-m">Top Genres</Heading>
+                    <Row fillWidth gap="12" wrap>
+                      {stats.top_genres.slice(0, 8).map((genre, index) => (
+                        <Card key={genre.genre} padding="12" radius="m" background="neutral-alpha-weak">
+                          <Row gap="8" vertical="center">
+                            <Text variant="body-strong-s">{genre.genre}</Text>
+                            <Text variant="body-default-xs" onBackground="neutral-weak">
+                              ({genre.count})
+                            </Text>
+                          </Row>
+                        </Card>
+                      ))}
+                    </Row>
+                  </Column>
+                </Card>
+              )}
+            </Column>
+          ) : (
+            <Column fillWidth gap="20" horizontal="center" paddingY="40">
+              <Text variant="heading-strong-m">Loading Stats...</Text>
+              <Text variant="body-default-m" onBackground="neutral-weak">
+                Fetching your listening statistics...
+              </Text>
+            </Column>
+          )
         )}
 
         {/* Music DNA Tab */}
-        {activeTab === 'genres' && stats && (
-          <Card padding="24" radius="l" background="surface" border="neutral-alpha-weak">
-            <Column gap="20">
-              <Column gap="8" horizontal="center">
-                <Heading variant="heading-strong-l">My Music DNA</Heading>
-                <Text variant="body-default-m" onBackground="neutral-weak">
-                  Based on audio features of my top tracks from {stats.time_range_label}
-                </Text>
+        {activeTab === 'genres' && (
+          stats ? (
+            <Card padding="24" radius="l" background="surface" border="neutral-alpha-weak">
+              <Column gap="20">
+                <Column gap="8" horizontal="center">
+                  <Heading variant="heading-strong-l">My Music DNA</Heading>
+                  <Text variant="body-default-m" onBackground="neutral-weak">
+                    Based on audio features of my top tracks from {stats.time_range_label}
+                  </Text>
+                </Column>
+                <Row fillWidth gap="24" wrap>
+                  {Object.entries(stats.music_dna).map(([feature, value]) => (
+                    <Column key={feature} gap="12" flex={1} minWidth={200}>
+                      <Row horizontal="between" vertical="center">
+                        <Text variant="body-strong-m" style={{ textTransform: 'capitalize' }}>
+                          {feature}
+                        </Text>
+                        <Text variant="body-default-s" onBackground="neutral-weak">
+                          {Math.round(value * 100)}%
+                        </Text>
+                      </Row>
+                      <div className={styles.progressBar}>
+                        <div 
+                          className={styles.progressFill}
+                          style={{ 
+                            width: `${value * 100}%`,
+                            backgroundColor: '#1DB954'
+                          }}
+                        />
+                      </div>
+                      <Text variant="body-default-xs" onBackground="neutral-weak">
+                        {getAudioFeatureDescription(feature, value)}
+                      </Text>
+                    </Column>
+                  ))}
+                </Row>
               </Column>
-              <Row fillWidth gap="24" wrap>
-                {Object.entries(stats.music_dna).map(([feature, value]) => (
-                  <Column key={feature} gap="12" flex={1} minWidth={200}>
-                    <Row horizontal="between" vertical="center">
-                      <Text variant="body-strong-m" style={{ textTransform: 'capitalize' }}>
-                        {feature}
-                      </Text>
-                      <Text variant="body-default-s" onBackground="neutral-weak">
-                        {Math.round(value * 100)}%
-                      </Text>
-                    </Row>
-                    <div className={styles.progressBar}>
-                      <div 
-                        className={styles.progressFill}
-                        style={{ 
-                          width: `${value * 100}%`,
-                          backgroundColor: '#1DB954'
-                        }}
-                      />
-                    </div>
-                    <Text variant="body-default-xs" onBackground="neutral-weak">
-                      {getAudioFeatureDescription(feature, value)}
-                    </Text>
-                  </Column>
-                ))}
-              </Row>
+            </Card>
+          ) : (
+            <Column fillWidth gap="20" horizontal="center" paddingY="40">
+              <Text variant="heading-strong-m">Loading Music DNA...</Text>
+              <Text variant="body-default-m" onBackground="neutral-weak">
+                Analyzing your audio features...
+              </Text>
             </Column>
-          </Card>
+          )
         )}
       </Column>
     </Column>
