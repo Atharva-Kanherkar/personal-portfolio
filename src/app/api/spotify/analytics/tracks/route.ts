@@ -26,8 +26,20 @@ export async function GET(request: NextRequest) {
     const timeRange = searchParams.get('time_range') as 'short_term' | 'medium_term' | 'long_term' || 'medium_term';
 
     spotifyApi.setRefreshToken(process.env.SPOTIFY_REFRESH_TOKEN);
-    const data = await spotifyApi.refreshAccessToken();
-    spotifyApi.setAccessToken(data.body.access_token);
+    
+    // Try to refresh the access token
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let accessTokenData: any;
+    try {
+      accessTokenData = await spotifyApi.refreshAccessToken();
+      spotifyApi.setAccessToken(accessTokenData.body.access_token);
+    } catch (authError) {
+      console.error('Spotify authentication error:', authError);
+      return NextResponse.json({ 
+        error: 'Spotify authentication failed. Please update your refresh token.',
+        details: authError instanceof Error ? authError.message : 'Authentication error'
+      }, { status: 401 });
+    }
 
     // Get top tracks for the specified time range
     const topTracks = await spotifyApi.getMyTopTracks({ 
@@ -35,9 +47,43 @@ export async function GET(request: NextRequest) {
       time_range: timeRange 
     });
 
+    // Check if we have tracks
+    if (!topTracks.body.items || topTracks.body.items.length === 0) {
+      return NextResponse.json({ 
+        tracks: [],
+        message: 'No tracks found for this time range'
+      });
+    }
+
     // Get audio features for all tracks
     const trackIds = topTracks.body.items.map(track => track.id);
-    const audioFeatures = await spotifyApi.getAudioFeaturesForTracks(trackIds);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let audioFeatures: any;
+    
+    try {
+      audioFeatures = await spotifyApi.getAudioFeaturesForTracks(trackIds);
+    } catch (featuresError) {
+      console.error('Error fetching audio features:', featuresError);
+      // Return tracks without audio features if this fails
+      const tracksWithoutFeatures = topTracks.body.items.map((track) => ({
+        id: track.id,
+        name: track.name,
+        artist: track.artists.map((artist) => artist.name).join(', '),
+        album: track.album.name,
+        image: track.album.images[0]?.url,
+        popularity: track.popularity,
+        duration_ms: track.duration_ms,
+        audio_features: {
+          danceability: 0,
+          energy: 0,
+          valence: 0,
+          acousticness: 0,
+          instrumentalness: 0,
+          tempo: 0,
+        }
+      }));
+      return NextResponse.json({ tracks: tracksWithoutFeatures });
+    }
 
     // Combine track data with audio features
     const tracksWithFeatures = topTracks.body.items.map((track, index) => ({

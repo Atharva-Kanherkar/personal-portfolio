@@ -73,21 +73,41 @@ export default function SpotifyAnalytics() {
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const [tracksRes, artistsRes, statsRes] = await Promise.all([
         fetch(`/api/spotify/analytics/tracks?time_range=${selectedTimeRange}`),
         fetch(`/api/spotify/analytics/artists?time_range=${selectedTimeRange}`),
         fetch(`/api/spotify/analytics/stats?time_range=${selectedTimeRange}`)
       ]);
 
-      if (!tracksRes.ok || !artistsRes.ok || !statsRes.ok) {
-        throw new Error('Failed to fetch analytics data');
+      // Handle individual endpoint failures
+      let tracksData = { tracks: [] };
+      let artistsData = { artists: [] };
+      let statsData = { stats: null };
+
+      if (tracksRes.ok) {
+        tracksData = await tracksRes.json();
+      } else {
+        console.warn('Failed to fetch tracks data:', tracksRes.status);
       }
 
-      const [tracksData, artistsData, statsData] = await Promise.all([
-        tracksRes.json(),
-        artistsRes.json(),
-        statsRes.json()
-      ]);
+      if (artistsRes.ok) {
+        artistsData = await artistsRes.json();
+      } else {
+        console.warn('Failed to fetch artists data:', artistsRes.status);
+      }
+
+      if (statsRes.ok) {
+        statsData = await statsRes.json();
+      } else {
+        console.warn('Failed to fetch stats data:', statsRes.status);
+      }
+
+      // Check if all endpoints failed
+      if (!tracksRes.ok && !artistsRes.ok && !statsRes.ok) {
+        throw new Error('All Spotify API endpoints failed. Please check your authentication.');
+      }
 
       setTracks(tracksData.tracks || []);
       setArtists(artistsData.artists || []);
@@ -142,8 +162,33 @@ export default function SpotifyAnalytics() {
   if (error) {
     return (
       <Column fillWidth gap="xl" paddingY="24" horizontal="center">
-        <Text variant="heading-strong-xl">Error loading analytics</Text>
+        <Text variant="heading-strong-xl">Unable to load Spotify analytics</Text>
         <Text variant="body-default-l" onBackground="neutral-weak">{error}</Text>
+        <Text variant="body-default-m" onBackground="neutral-weak">
+          This might be due to an expired Spotify refresh token. Please check your environment variables.
+        </Text>
+        <Button onClick={() => { window.location.href = '/'; }} size="m">
+          <FaArrowLeft /> Back to Home
+        </Button>
+      </Column>
+    );
+  }
+
+  // Check if we have any data to display
+  const hasData = tracks.length > 0 || artists.length > 0 || stats;
+  
+  if (!loading && !hasData) {
+    return (
+      <Column fillWidth gap="xl" paddingY="24" horizontal="center">
+        <Text variant="heading-strong-xl">No Spotify data available</Text>
+        <Text variant="body-default-l" onBackground="neutral-weak">
+          Unable to load your Spotify listening data. This might be due to:
+        </Text>
+        <Column gap="8" paddingX="24">
+          <Text variant="body-default-m" onBackground="neutral-weak">• Expired Spotify refresh token</Text>
+          <Text variant="body-default-m" onBackground="neutral-weak">• No listening history for the selected time range</Text>
+          <Text variant="body-default-m" onBackground="neutral-weak">• Spotify API authentication issues</Text>
+        </Column>
         <Button onClick={() => { window.location.href = '/'; }} size="m">
           <FaArrowLeft /> Back to Home
         </Button>

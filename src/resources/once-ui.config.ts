@@ -23,6 +23,7 @@ const routes: RoutesConfig = {
   "/gallery": false,
   "/spotify-setup": true,
   "/spotify-analytics": true,
+  "/spotify-token-refresh": true,
 };
 
 const display: DisplayConfig = {

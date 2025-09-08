@@ -17,14 +17,50 @@ export async function GET(request: NextRequest) {
     const timeRange = searchParams.get('time_range') as 'short_term' | 'medium_term' | 'long_term' || 'medium_term';
 
     spotifyApi.setRefreshToken(process.env.SPOTIFY_REFRESH_TOKEN);
-    const data = await spotifyApi.refreshAccessToken();
-    spotifyApi.setAccessToken(data.body.access_token);
+    
+    // Try to refresh the access token
+    try {
+      const data = await spotifyApi.refreshAccessToken();
+      spotifyApi.setAccessToken(data.body.access_token);
+    } catch (authError) {
+      console.error('Spotify authentication error:', authError);
+      return NextResponse.json({ 
+        error: 'Spotify authentication failed. Please update your refresh token.',
+        details: authError instanceof Error ? authError.message : 'Authentication error'
+      }, { status: 401 });
+    }
 
     // Get top tracks and artists for calculations
     const [topTracks, topArtists] = await Promise.all([
       spotifyApi.getMyTopTracks({ limit: 50, time_range: timeRange }),
       spotifyApi.getMyTopArtists({ limit: 50, time_range: timeRange })
     ]);
+
+    // Check if we have data
+    if (!topTracks.body.items || topTracks.body.items.length === 0) {
+      return NextResponse.json({ 
+        stats: {
+          total_tracks: 0,
+          total_artists: 0,
+          total_listening_time_ms: 0,
+          unique_genres: 0,
+          top_genres: [],
+          average_track_popularity: 0,
+          average_artist_popularity: 0,
+          music_dna: {
+            danceability: 0,
+            energy: 0,
+            valence: 0,
+            acousticness: 0,
+            instrumentalness: 0,
+            speechiness: 0,
+          },
+          time_range_label: timeRange === 'short_term' ? 'Last 4 weeks' : 
+                           timeRange === 'medium_term' ? 'Last 6 months' : 
+                           'All time',
+        }
+      });
+    }
 
     // Calculate total listening time (estimate based on track durations)
     const totalListeningTime = topTracks.body.items.reduce((total, track) => {
