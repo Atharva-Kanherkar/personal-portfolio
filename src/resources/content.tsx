@@ -12,10 +12,10 @@ const person: Person = {
   languages: ["English"], // optional: Leave the array empty if you don't want to display languages
 };
 
-const newsletter: Newsletter = {
-  display: true,
+ const newsletter: Newsletter = {
+  display: false, // Set to false if you don't want newsletter signup
   title: <>Subscribe to {person.firstName}'s Newsletter</>,
-  description: <>My weekly newsletter about creativity and engineering</>,
+  description: <>Updates on backend engineering, open source contributions, and system architecture insights</>, // Updated description
 };
 
 const social: Social = [
@@ -39,15 +39,16 @@ const social: Social = [
   },
 ];
 
+ // ...existing code...
 const home: Home = {
   path: "/",
   image: "/images/og/home.jpg",
   label: "Home",
   title: `${person.name}'s Portfolio`,
   description: `Portfolio website showcasing my work as a ${person.role}`,
-  headline: <>Building bridges between design and code</>,
+  headline: <>Building scalable backends and distributed systems</>, // Updated to match your focus
   featured: {
-    display: true,
+    display: false, // Remove this template project feature
     title: (
       <Row gap="12" vertical="center">
         <strong className="ml-4">Once UI</strong>{" "}
@@ -57,16 +58,16 @@ const home: Home = {
         </Text>
       </Row>
     ),
-    href: "/work/building-once-ui-a-customizable-design-system",
+    href: "/work/building-once-ui-a-customizable-design-system", // This is template content
   },
   subline: (
     <>
-      I'm Atharva, a software engineer  
-     
-      
+      I'm Atharva, a backend engineer passionate about building scalable systems, 
+      contributing to open source, and exploring distributed architectures.
     </>
   ),
 };
+ 
 
 const about: About = {
   path: "/about",
@@ -81,7 +82,7 @@ const about: About = {
     display: true,
   },
   calendar: {
-    display: true,
+    display: false,
     link: "https://cal.com",
   },
   intro: {
@@ -89,13 +90,14 @@ const about: About = {
     title: "Introduction",
     description: (
       <>
-      I am a backend-focused fullstack developer with a strong foundation in open source and DevOps. I’ve contributed to projects through GSoC (Workflows4s), the Linux Foundation’s LFX Mentorship, and Typelevel, while also working on distributed, data-driven systems at Rimo in Tokyo. Skilled in Go, TypeScript, and cloud-native technologies, I thrive on building scalable backends, developer-first tools, and production-ready SaaS products.
+      I am a backend-focused fullstack developer with a strong foundation in open source and DevOps. I’ve contributed to projects through GSoC (Workflows4s), the Linux Foundation’s LFX Mentorship, and Typelevel, while also working on distributed, data-driven systems at Rimo in Tokyo. Skilled in Go, TypeScript, Scala, C++ and cloud-native technologies, I thrive on building scalable backends, developer-first tools, and production-ready SaaS products.
        </>
     ),
   },
   work: {
   display: true,
   title: "Work Experience",
+  description: `Engineering projects and open source contributions by ${person.name}`, 
   experiences: [
     {
       company: "Rimo LLC, Tokyo",
@@ -257,7 +259,7 @@ technical: {
 const blog: Blog = {
   path: "/blog",
   label: "Blog",
-  title: "Writing about design and tech...",
+  title: "Crafting scalable backends and tinkering with distributed systems...",
   description: `Read what ${person.name} has been up to recently`,
   // Create new blog posts by adding a new .mdx file to app/blog/posts
   // All posts will be listed on the /blog route
