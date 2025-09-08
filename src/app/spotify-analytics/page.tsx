@@ -12,6 +12,7 @@ interface Artist {
   popularity: number;
   genres: string[];
   followers: number;
+  external_url: string;
 }
 
 interface AudioFeatures {
@@ -107,6 +108,7 @@ export default function SpotifyAnalytics() {
 
       if (statsRes.ok) {
         statsData = await statsRes.json();
+        console.log('Stats data received:', statsData); // Debug log
       } else {
         console.warn('Failed to fetch stats data:', statsRes.status);
       }
@@ -118,7 +120,9 @@ export default function SpotifyAnalytics() {
 
       setTracks(tracksData.tracks || []);
       setArtists(artistsData.artists || []);
-      setStats(statsData.stats || null);
+      // Fix: API returns { stats: ListeningStats }
+      setStats(statsData?.stats || null);
+      console.log('Stats set to:', statsData?.stats || null); // Debug log
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
     } finally {
@@ -376,66 +380,57 @@ export default function SpotifyAnalytics() {
 
         {/* Artists Tab */}
         {activeTab === 'artists' && 
-          <Row fillWidth gap="16" wrap>
-            {artists.slice(0, 12).map((artist) => (
-              <Card
-                key={artist.id}
-                padding="20"
-                radius="l"
-                border="neutral-alpha-weak"
-                background="surface"
-                className={styles.artistCard}
-                minWidth={180}
-              >
-                <Column gap="12" horizontal="center">
+          artists.slice(0, 20).map((artist) => (
+            <Card
+              key={artist.id}
+              padding="16"
+              radius="m"
+              border="neutral-alpha-weak"
+              background="surface"
+              className={styles.trackCard}
+            >
+              <Row fillWidth gap="16" vertical="center">
+                <Row gap="12" vertical="center" flex={1}>
                   {artist.image && (
                     <img
                       src={artist.image}
                       alt={artist.name}
                       style={{ 
-                        width: '80px', 
-                        height: '80px', 
+                        width: '48px', 
+                        height: '48px', 
                         borderRadius: '50%',
                         objectFit: 'cover'
                       }}
                     />
                   )}
-                  <Column gap="4" horizontal="center">
-                    <Text variant="body-strong-m" style={{ textAlign: 'center' }}>
+                  <Column gap="4" flex={1}>
+                    <Text variant="body-strong-m">
                       {artist.name}
                     </Text>
                     <Text variant="body-default-s" onBackground="neutral-weak">
+                      {artist.genres.slice(0, 3).join(', ')}
+                    </Text>
+                  </Column>
+                </Row>
+                <Row gap="8" vertical="center">
+                  <Column gap="4" horizontal="end">
+                    <Text variant="body-default-s">{artist.followers.toLocaleString()} followers</Text>
+                    <Text variant="body-default-xs" onBackground="neutral-weak">
                       {formatPopularity(artist.popularity)} popularity
                     </Text>
-                    {artist.followers && (
-                      <Text variant="body-default-xs" onBackground="neutral-weak">
-                        {artist.followers.toLocaleString()} followers
-                      </Text>
-                    )}
                   </Column>
-                  {artist.genres.length > 0 && (
-                    <Row gap="4" wrap horizontal="center">
-                      {artist.genres.slice(0, 2).map((genre) => (
-                        <Text 
-                          key={genre}
-                          variant="body-default-xs" 
-                          onBackground="neutral-weak"
-                          style={{ 
-                            padding: '4px 8px',
-                            backgroundColor: 'rgba(29, 185, 84, 0.1)',
-                            borderRadius: '6px',
-                            textAlign: 'center'
-                          }}
-                        >
-                          {genre}
-                        </Text>
-                      ))}
-                    </Row>
-                  )}
-                </Column>
-              </Card>
-            ))}
-          </Row>
+                  <Button
+                    onClick={() => openInSpotify(artist.external_url)}
+                    variant="tertiary"
+                    size="s"
+                    style={{ minWidth: '32px' }}
+                  >
+                    <FaExternalLinkAlt size={12} />
+                  </Button>
+                </Row>
+              </Row>
+            </Card>
+          ))
         }
 
         {/* Stats Tab */}

@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       genres: artist.genres,
       popularity: artist.popularity,
       followers: artist.followers.total,
+      external_url: artist.external_urls.spotify,
     }));
 
     return NextResponse.json({ artists });
