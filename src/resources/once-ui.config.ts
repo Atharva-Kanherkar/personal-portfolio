@@ -21,6 +21,7 @@ const routes: RoutesConfig = {
   "/work": true,
   "/blog": true,
   "/gallery": false,
+  "/monitoring": true,
   "/spotify-setup": true,
   "/spotify-analytics": true,
   "/spotify-token-refresh": true,

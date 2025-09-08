@@ -132,20 +132,39 @@ export async function GET(request: NextRequest) {
     // Calculate average audio features (Music DNA)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const validFeatures = audioFeatures.body.audio_features.filter((features: any) => features !== null);
-    const averageFeatures = {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      danceability: validFeatures.reduce((sum: number, features: any) => sum + features.danceability, 0) / validFeatures.length,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      energy: validFeatures.reduce((sum: number, features: any) => sum + features.energy, 0) / validFeatures.length,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      valence: validFeatures.reduce((sum: number, features: any) => sum + features.valence, 0) / validFeatures.length,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      acousticness: validFeatures.reduce((sum: number, features: any) => sum + features.acousticness, 0) / validFeatures.length,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      instrumentalness: validFeatures.reduce((sum: number, features: any) => sum + features.instrumentalness, 0) / validFeatures.length,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      speechiness: validFeatures.reduce((sum: number, features: any) => sum + features.speechiness, 0) / validFeatures.length,
-    };
+    console.log('Valid features count:', validFeatures.length);
+    console.log('First feature sample:', validFeatures[0]);
+    
+    // Check if we have valid features
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let averageFeatures: any;
+    if (validFeatures.length === 0) {
+      console.log('No valid audio features found');
+      averageFeatures = {
+        danceability: 0,
+        energy: 0,
+        valence: 0,
+        acousticness: 0,
+        instrumentalness: 0,
+        speechiness: 0,
+      };
+    } else {
+      averageFeatures = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        danceability: validFeatures.reduce((sum: number, features: any) => sum + features.danceability, 0) / validFeatures.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        energy: validFeatures.reduce((sum: number, features: any) => sum + features.energy, 0) / validFeatures.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        valence: validFeatures.reduce((sum: number, features: any) => sum + features.valence, 0) / validFeatures.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        acousticness: validFeatures.reduce((sum: number, features: any) => sum + features.acousticness, 0) / validFeatures.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        instrumentalness: validFeatures.reduce((sum: number, features: any) => sum + features.instrumentalness, 0) / validFeatures.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        speechiness: validFeatures.reduce((sum: number, features: any) => sum + features.speechiness, 0) / validFeatures.length,
+      };
+      console.log('Calculated averages:', averageFeatures);
+    }
 
     const stats = {
       total_tracks: topTracks.body.items.length,

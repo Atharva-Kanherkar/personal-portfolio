@@ -55,7 +55,7 @@ interface TimeRangeData {
   value: 'short_term' | 'medium_term' | 'long_term';
 }
 
-type TabType = 'tracks' | 'artists' | 'stats' | 'genres';
+type TabType = 'tracks' | 'artists';
 
 const timeRanges: TimeRangeData[] = [
   { label: '4 Weeks', value: 'short_term' },
@@ -68,7 +68,6 @@ export default function SpotifyAnalytics() {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'short_term' | 'medium_term' | 'long_term'>('medium_term');
   const [tracks, setTracks] = useState<TrackWithFeatures[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
-  const [stats, setStats] = useState<ListeningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
@@ -84,16 +83,14 @@ export default function SpotifyAnalytics() {
       setLoading(true);
       setError(null);
       
-      const [tracksRes, artistsRes, statsRes] = await Promise.all([
+      const [tracksRes, artistsRes] = await Promise.all([
         fetch(`/api/spotify/analytics/tracks?time_range=${selectedTimeRange}`),
-        fetch(`/api/spotify/analytics/artists?time_range=${selectedTimeRange}`),
-        fetch(`/api/spotify/analytics/stats?time_range=${selectedTimeRange}`)
+        fetch(`/api/spotify/analytics/artists?time_range=${selectedTimeRange}`)
       ]);
 
       // Handle individual endpoint failures
       let tracksData = { tracks: [] };
       let artistsData = { artists: [] };
-      let statsData = { stats: null };
 
       if (tracksRes.ok) {
         tracksData = await tracksRes.json();
@@ -107,21 +104,13 @@ export default function SpotifyAnalytics() {
         console.warn('Failed to fetch artists data:', artistsRes.status);
       }
 
-      if (statsRes.ok) {
-        statsData = await statsRes.json();
-      } else {
-        console.warn('Failed to fetch stats data:', statsRes.status);
-      }
-
       // Check if all endpoints failed
-      if (!tracksRes.ok && !artistsRes.ok && !statsRes.ok) {
+      if (!tracksRes.ok && !artistsRes.ok) {
         throw new Error('All Spotify API endpoints failed. Please check your authentication.');
       }
 
       setTracks(tracksData.tracks || []);
       setArtists(artistsData.artists || []);
-      // Fix: API returns { stats: ListeningStats }
-      setStats(statsData?.stats || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
     } finally {
@@ -234,7 +223,7 @@ export default function SpotifyAnalytics() {
   }
 
   // Check if we have any data to display
-  const hasData = tracks.length > 0 || artists.length > 0 || stats;
+  const hasData = tracks.length > 0 || artists.length > 0;
   
   if (!loading && !hasData) {
     return (
@@ -297,8 +286,6 @@ export default function SpotifyAnalytics() {
         {[
           { id: 'tracks', label: 'Top Tracks', icon: FaFire },
           { id: 'artists', label: 'Top Artists', icon: FaUser },
-          { id: 'stats', label: 'Listening Stats', icon: FaCalendarAlt },
-          { id: 'genres', label: 'Music DNA', icon: FaMusic },
         ].map((tab) => (
           <Button
             key={tab.id}
@@ -431,8 +418,10 @@ export default function SpotifyAnalytics() {
             </Card>
           ))
         }
-
-        {/* Stats Tab */}
+      </Column>
+    </Column>
+  );
+}
         {activeTab === 'stats' && (
           stats ? (
             <Column fillWidth gap="20">
