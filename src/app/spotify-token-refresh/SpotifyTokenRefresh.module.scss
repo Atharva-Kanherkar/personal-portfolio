@@ -1,0 +1,458 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, 
+    rgba(29, 185, 84, 0.05) 0%, 
+    rgba(0, 0, 0, 0.02) 50%, 
+    rgba(29, 185, 84, 0.03) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.mainContent {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Hero Section */
+.heroSection {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.heroIcon {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.spotifyPulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(29, 185, 84, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.heroTitle {
+  background: linear-gradient(135deg, #1DB954, #1ed760);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.heroSubtitle {
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Progress Indicator */
+.progressContainer {
+  margin-bottom: 3rem;
+}
+
+.progressBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.progressStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  min-width: 120px;
+  
+  svg {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+  }
+  
+  span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+  }
+  
+  &.active {
+    background: rgba(29, 185, 84, 0.1);
+    border-color: #1DB954;
+    transform: translateY(-2px);
+    
+    svg {
+      color: #1DB954;
+    }
+    
+    span {
+      color: #1DB954;
+    }
+  }
+}
+
+.progressConnector {
+  height: 2px;
+  width: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  
+  &.active {
+    background: linear-gradient(90deg, #1DB954, #1ed760);
+  }
+}
+
+/* Step Container */
+.stepContainer {
+  margin-bottom: 3rem;
+}
+
+.stepCard {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 
+                0 0 0 1px rgba(29, 185, 84, 0.1);
+  }
+}
+
+.stepIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1DB954, #1ed760);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  
+  svg {
+    color: white;
+  }
+}
+
+.stepTitle {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.stepDescription {
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* Buttons */
+.primaryButton {
+  background: linear-gradient(135deg, #1DB954, #1ed760) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 1rem 2rem !important;
+  gap: 0.75rem !important;
+  transition: all 0.3s ease !important;
+  
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 25px rgba(29, 185, 84, 0.3) !important;
+  }
+  
+  &:disabled {
+    opacity: 0.6 !important;
+    transform: none !important;
+    cursor: not-allowed !important;
+  }
+}
+
+/* Input Styling */
+.inputContainer {
+  width: 100%;
+  max-width: 500px;
+}
+
+.codeInput {
+  width: 100% !important;
+  padding: 1rem !important;
+  border: 2px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace !important;
+  font-size: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  
+  &:focus {
+    border-color: #1DB954 !important;
+    box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1) !important;
+    outline: none !important;
+  }
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Tokens Section */
+.tokensContainer {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tokenGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tokenLabel {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tokenCard {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+  
+  &:hover {
+    border-color: rgba(29, 185, 84, 0.3) !important;
+  }
+}
+
+.tokenValue {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  word-break: break-all;
+  flex: 1;
+}
+
+.copyButton {
+  background: rgba(29, 185, 84, 0.1) !important;
+  border: 1px solid rgba(29, 185, 84, 0.3) !important;
+  transition: all 0.3s ease !important;
+  
+  &:hover {
+    background: rgba(29, 185, 84, 0.2) !important;
+    transform: scale(1.05) !important;
+  }
+}
+
+/* Environment Card */
+.envCard {
+  background: linear-gradient(135deg, 
+    rgba(29, 185, 84, 0.1), 
+    rgba(29, 185, 84, 0.05)) !important;
+  border: 1px solid rgba(29, 185, 84, 0.2) !important;
+  width: 100%;
+  max-width: 600px;
+}
+
+.codeBlock {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  color: #1ed760;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Help Section */
+.helpCard {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.helpTitle {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.helpGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.helpItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(29, 185, 84, 0.05);
+    border-color: rgba(29, 185, 84, 0.2);
+  }
+  
+  svg {
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .heroTitle {
+    font-size: 2rem;
+  }
+  
+  .progressBar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .progressConnector {
+    width: 2px;
+    height: 30px;
+    transform: rotate(90deg);
+  }
+  
+  .progressStep {
+    min-width: auto;
+    width: 200px;
+  }
+  
+  .stepCard {
+    padding: 2rem 1.5rem !important;
+  }
+  
+  .tokensContainer {
+    max-width: 100%;
+  }
+  
+  .tokenValue {
+    font-size: 0.7rem;
+  }
+  
+  .helpGrid {
+    gap: 0.75rem;
+  }
+  
+  .helpItem {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroIcon {
+    margin-bottom: 1rem;
+  }
+  
+  .spotifyPulse {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .heroTitle {
+    font-size: 1.75rem;
+  }
+  
+  .stepIcon {
+    width: 60px;
+    height: 60px;
+    
+    svg {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .primaryButton {
+    padding: 0.875rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .codeInput {
+    font-size: 0.75rem !important;
+  }
+  
+  .codeBlock {
+    font-size: 0.75rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: linear-gradient(135deg, 
+      rgba(29, 185, 84, 0.08) 0%, 
+      rgba(0, 0, 0, 0.05) 50%, 
+      rgba(29, 185, 84, 0.06) 100%);
+  }
+  
+  .stepCard {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  
+  .tokenCard {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  
+  .helpCard {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+}

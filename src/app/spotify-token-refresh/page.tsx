@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Column, Row, Text, Heading, Card, Button, Input } from "@once-ui-system/core";
-import { FaSpotify, FaCopy, FaCheck, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaSpotify, FaCopy, FaCheck, FaExternalLinkAlt, FaShieldAlt, FaCode, FaArrowRight } from 'react-icons/fa';
+import styles from './SpotifyTokenRefresh.module.scss';
 
 export default function SpotifyTokenRefresh() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -54,143 +55,231 @@ export default function SpotifyTokenRefresh() {
   };
 
   return (
-    <Column fillWidth gap="xl" paddingY="24" paddingX="24" maxWidth="m" horizontal="center">
-      {/* Header */}
-      <Column fillWidth gap="16" horizontal="center">
-        <Row gap="12" vertical="center">
-          <FaSpotify size={32} color="#1DB954" />
-          <Heading variant="heading-strong-xl">Refresh Spotify Token</Heading>
-        </Row>
-        <Text variant="body-default-l" onBackground="neutral-weak">
-          Generate a new refresh token to fix your Spotify integration
-        </Text>
-      </Column>
+    <div className={styles.container}>
+      <Column fillWidth maxWidth="l" gap="xl" horizontal="center" className={styles.mainContent}>
+        {/* Hero Header */}
+        <div className={styles.heroSection}>
+          <Row gap="16" vertical="center" horizontal="center" className={styles.heroIcon}>
+            <FaSpotify size={48} color="#1DB954" />
+            <div className={styles.spotifyPulse} />
+          </Row>
+          <Heading variant="heading-strong-xl" className={styles.heroTitle}>
+            Spotify Token Refresh
+          </Heading>
+          <Text variant="body-default-xl" onBackground="neutral-weak" className={styles.heroSubtitle}>
+            Generate secure tokens to power your music analytics
+          </Text>
+        </div>
 
-      {/* Step 1: Start Authorization */}
-      {step === 1 && (
-        <Card padding="24" radius="l" background="surface">
-          <Column gap="16">
-            <Heading variant="heading-strong-l">Step 1: Authorize with Spotify</Heading>
-            <Text variant="body-default-m" onBackground="neutral-weak">
-              Click the button below to authorize your application with Spotify. This will open a new window.
-            </Text>
-            <Button onClick={startAuth} variant="primary" size="m">
-              <FaSpotify /> Authorize with Spotify
-            </Button>
-          </Column>
-        </Card>
-      )}
+        {/* Progress Indicator */}
+        <div className={styles.progressContainer}>
+          <div className={styles.progressBar}>
+            <div className={`${styles.progressStep} ${step >= 1 ? styles.active : ''}`}>
+              <FaShieldAlt />
+              <span>Authorize</span>
+            </div>
+            <div className={`${styles.progressConnector} ${step >= 2 ? styles.active : ''}`} />
+            <div className={`${styles.progressStep} ${step >= 2 ? styles.active : ''}`}>
+              <FaCode />
+              <span>Get Code</span>
+            </div>
+            <div className={`${styles.progressConnector} ${step >= 3 ? styles.active : ''}`} />
+            <div className={`${styles.progressStep} ${step >= 3 ? styles.active : ''}`}>
+              <FaCheck />
+              <span>Complete</span>
+            </div>
+          </div>
+        </div>
 
-      {/* Step 2: Get Authorization Code */}
-      {step === 2 && (
-        <Card padding="24" radius="l" background="surface">
-          <Column gap="16">
-            <Heading variant="heading-strong-l">Step 2: Enter Authorization Code</Heading>
-            <Text variant="body-default-m" onBackground="neutral-weak">
-              After authorizing, you'll be redirected to a page showing your authorization code. Copy and paste it here:
-            </Text>
-            <Input
-              id="auth-code"
-              value={authCode}
-              onChange={(e) => setAuthCode(e.target.value)}
-              placeholder="Paste your authorization code here..."
-            />
-            <Button 
-              onClick={exchangeCodeForTokens} 
-              variant="primary" 
-              size="m"
-              disabled={!authCode.trim() || loading}
-            >
-              {loading ? 'Processing...' : 'Get Tokens'}
-            </Button>
-          </Column>
-        </Card>
-      )}
-
-      {/* Step 3: Copy Tokens */}
-      {step === 3 && tokens && (
-        <Card padding="24" radius="l" background="surface">
-          <Column gap="16">
-            <Heading variant="heading-strong-l">Step 3: Update Environment Variables</Heading>
-            <Text variant="body-default-m" onBackground="neutral-weak">
-              Copy these tokens and update your environment variables:
-            </Text>
-            
-            <Column gap="12">
-              <Column gap="8">
-                <Text variant="body-strong-s">Access Token (for testing):</Text>
-                <Card padding="12" radius="m" background="neutral-alpha-weak">
-                  <Row gap="8" vertical="center">
-                    <Text variant="body-default-xs" style={{ wordBreak: 'break-all', flex: 1 }}>
-                      {tokens.access_token}
-                    </Text>
-                    <Button
-                      onClick={() => copyToClipboard(tokens.access_token, 'access')}
-                      variant="tertiary"
-                      size="s"
-                    >
-                      {copied === 'access' ? <FaCheck color="#1DB954" /> : <FaCopy />}
-                    </Button>
-                  </Row>
-                </Card>
-              </Column>
-
-              <Column gap="8">
-                <Text variant="body-strong-s">Refresh Token (add to .env.local):</Text>
-                <Card padding="12" radius="m" background="neutral-alpha-weak">
-                  <Row gap="8" vertical="center">
-                    <Text variant="body-default-xs" style={{ wordBreak: 'break-all', flex: 1 }}>
-                      {tokens.refresh_token}
-                    </Text>
-                    <Button
-                      onClick={() => copyToClipboard(tokens.refresh_token, 'refresh')}
-                      variant="tertiary"
-                      size="s"
-                    >
-                      {copied === 'refresh' ? <FaCheck color="#1DB954" /> : <FaCopy />}
-                    </Button>
-                  </Row>
-                </Card>
-              </Column>
-            </Column>
-
-            <Card padding="16" radius="m" background="accent-alpha-weak">
-              <Column gap="8">
-                <Text variant="body-strong-s">Update your .env.local file:</Text>
-                <Text variant="body-default-xs" style={{ fontFamily: 'monospace' }}>
-                  SPOTIFY_REFRESH_TOKEN={tokens.refresh_token}
+        {/* Step Content */}
+        <div className={styles.stepContainer}>
+          {/* Step 1: Start Authorization */}
+          {step === 1 && (
+            <Card padding="32" radius="xl" background="surface" className={styles.stepCard}>
+              <Column gap="24" horizontal="center">
+                <div className={styles.stepIcon}>
+                  <FaShieldAlt size={32} />
+                </div>
+                <Heading variant="heading-strong-xl" className={styles.stepTitle}>
+                  Authorize with Spotify
+                </Heading>
+                <Text variant="body-default-l" onBackground="neutral-weak" className={styles.stepDescription}>
+                  Connect securely to your Spotify account to enable music data access
                 </Text>
+                <Button 
+                  onClick={startAuth} 
+                  variant="primary" 
+                  size="l"
+                  className={styles.primaryButton}
+                >
+                  <FaSpotify />
+                  <span>Authorize with Spotify</span>
+                  <FaArrowRight />
+                </Button>
               </Column>
             </Card>
+          )}
 
-            <Button 
-              onClick={() => { window.location.href = '/spotify-analytics'; }} 
-              variant="primary" 
-              size="m"
-            >
-              <FaExternalLinkAlt /> Test Analytics Page
-            </Button>
+          {/* Step 2: Get Authorization Code */}
+          {step === 2 && (
+            <Card padding="32" radius="xl" background="surface" className={styles.stepCard}>
+              <Column gap="24" horizontal="center">
+                <div className={styles.stepIcon}>
+                  <FaCode size={32} />
+                </div>
+                <Heading variant="heading-strong-xl" className={styles.stepTitle}>
+                  Enter Authorization Code
+                </Heading>
+                <Text variant="body-default-l" onBackground="neutral-weak" className={styles.stepDescription}>
+                  Copy the authorization code from the Spotify redirect page
+                </Text>
+                <div className={styles.inputContainer}>
+                  <Input
+                    id="auth-code"
+                    value={authCode}
+                    onChange={(e) => setAuthCode(e.target.value)}
+                    placeholder="Paste your authorization code here..."
+                    className={styles.codeInput}
+                  />
+                </div>
+                <Button 
+                  onClick={exchangeCodeForTokens} 
+                  variant="primary" 
+                  size="l"
+                  disabled={!authCode.trim() || loading}
+                  className={styles.primaryButton}
+                >
+                  {loading ? (
+                    <>
+                      <div className={styles.spinner} />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Get Tokens</span>
+                      <FaArrowRight />
+                    </>
+                  )}
+                </Button>
+              </Column>
+            </Card>
+          )}
+
+          {/* Step 3: Copy Tokens */}
+          {step === 3 && tokens && (
+            <Card padding="32" radius="xl" background="surface" className={styles.stepCard}>
+              <Column gap="24" horizontal="center">
+                <div className={styles.stepIcon}>
+                  <FaCheck size={32} color="#1DB954" />
+                </div>
+                <Heading variant="heading-strong-xl" className={styles.stepTitle}>
+                  Tokens Generated Successfully!
+                </Heading>
+                <Text variant="body-default-l" onBackground="neutral-weak" className={styles.stepDescription}>
+                  Copy your tokens and update your environment variables
+                </Text>
+                
+                <div className={styles.tokensContainer}>
+                  {/* Access Token */}
+                  <div className={styles.tokenGroup}>
+                    <Text variant="body-strong-m" className={styles.tokenLabel}>
+                      Access Token
+                    </Text>
+                    <Card padding="16" radius="l" background="neutral-alpha-weak" className={styles.tokenCard}>
+                      <Row gap="12" vertical="center">
+                        <Text variant="body-default-s" className={styles.tokenValue}>
+                          {tokens.access_token.substring(0, 40)}...
+                        </Text>
+                        <Button
+                          onClick={() => copyToClipboard(tokens.access_token, 'access')}
+                          variant="secondary"
+                          size="s"
+                          className={styles.copyButton}
+                        >
+                          {copied === 'access' ? <FaCheck color="#1DB954" /> : <FaCopy />}
+                        </Button>
+                      </Row>
+                    </Card>
+                  </div>
+
+                  {/* Refresh Token */}
+                  <div className={styles.tokenGroup}>
+                    <Text variant="body-strong-m" className={styles.tokenLabel}>
+                      Refresh Token
+                    </Text>
+                    <Card padding="16" radius="l" background="accent-alpha-weak" className={styles.tokenCard}>
+                      <Row gap="12" vertical="center">
+                        <Text variant="body-default-s" className={styles.tokenValue}>
+                          {tokens.refresh_token.substring(0, 40)}...
+                        </Text>
+                        <Button
+                          onClick={() => copyToClipboard(tokens.refresh_token, 'refresh')}
+                          variant="secondary"
+                          size="s"
+                          className={styles.copyButton}
+                        >
+                          {copied === 'refresh' ? <FaCheck color="#1DB954" /> : <FaCopy />}
+                        </Button>
+                      </Row>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Environment Setup */}
+                <Card padding="20" radius="l" background="brand-alpha-weak" className={styles.envCard}>
+                  <Column gap="12">
+                    <Text variant="body-strong-m">Update your .env.local file:</Text>
+                    <div className={styles.codeBlock}>
+                      <Text variant="body-default-s">
+                        SPOTIFY_REFRESH_TOKEN={tokens.refresh_token}
+                      </Text>
+                    </div>
+                  </Column>
+                </Card>
+
+                <Button 
+                  onClick={() => { window.location.href = '/spotify-analytics'; }} 
+                  variant="primary" 
+                  size="l"
+                  className={styles.primaryButton}
+                >
+                  <FaExternalLinkAlt />
+                  <span>Test Analytics Page</span>
+                </Button>
+              </Column>
+            </Card>
+          )}
+        </div>
+
+        {/* Help Section */}
+        <Card padding="24" radius="xl" background="neutral-alpha-weak" className={styles.helpCard}>
+          <Column gap="16">
+            <Heading variant="heading-strong-l" className={styles.helpTitle}>
+              Need Help?
+            </Heading>
+            <div className={styles.helpGrid}>
+              <div className={styles.helpItem}>
+                <FaShieldAlt size={20} color="#1DB954" />
+                <Text variant="body-default-s">
+                  Ensure your Spotify app has the correct redirect URI configured
+                </Text>
+              </div>
+              <div className={styles.helpItem}>
+                <FaCode size={20} color="#1DB954" />
+                <Text variant="body-default-s">
+                  Redirect URI: {typeof window !== 'undefined' ? `${window.location.origin}/api/spotify/callback` : 'your-domain.com/api/spotify/callback'}
+                </Text>
+              </div>
+              <div className={styles.helpItem}>
+                <FaArrowRight size={20} color="#1DB954" />
+                <Text variant="body-default-s">
+                  After updating .env.local, restart your development server
+                </Text>
+              </div>
+            </div>
           </Column>
         </Card>
-      )}
-
-      {/* Instructions */}
-      <Card padding="24" radius="l" background="neutral-alpha-weak">
-        <Column gap="12">
-          <Heading variant="heading-strong-m">Need Help?</Heading>
-          <Column gap="8">
-            <Text variant="body-default-s" onBackground="neutral-weak">
-              • Make sure your Spotify app has the correct redirect URI
-            </Text>
-            <Text variant="body-default-s" onBackground="neutral-weak">
-              • The redirect URI should be: {typeof window !== 'undefined' ? `${window.location.origin}/api/spotify/callback` : 'your-domain.com/api/spotify/callback'}
-            </Text>
-            <Text variant="body-default-s" onBackground="neutral-weak">
-              • After updating .env.local, restart your development server
-            </Text>
-          </Column>
-        </Column>
-      </Card>
-    </Column>
+      </Column>
+    </div>
   );
 }
