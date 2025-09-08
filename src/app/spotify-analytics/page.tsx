@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Column, Row, Text, Heading, Card, Button } from "@once-ui-system/core";
-import { FaSpotify, FaMusic, FaClock, FaCalendarAlt, FaUsers, FaHeadphones, FaArrowLeft } from 'react-icons/fa';
+import { FaSpotify, FaMusic, FaClock, FaCalendarAlt, FaUsers, FaHeadphones, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt } from 'react-icons/fa';
 import styles from './SpotifyAnalytics.module.scss';
 
 interface Artist {
@@ -31,6 +31,8 @@ interface TrackWithFeatures {
   image: string;
   popularity: number;
   duration_ms: number;
+  preview_url?: string | null;
+  external_url: string;
   audio_features: AudioFeatures;
 }
 
@@ -64,6 +66,8 @@ export default function SpotifyAnalytics() {
   const [stats, setStats] = useState<ListeningStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -119,6 +123,48 @@ export default function SpotifyAnalytics() {
     }
   };
 
+  const playPreview = (track: TrackWithFeatures) => {
+    if (!track.preview_url) {
+      // If no preview, open in Spotify
+      window.open(track.external_url, '_blank');
+      return;
+    }
+
+    if (currentPlaying === track.id) {
+      // Stop current track
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setCurrentPlaying(null);
+    } else {
+      // Stop any currently playing track
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      // Play new track
+      audioRef.current = new Audio(track.preview_url);
+      audioRef.current.volume = 0.5;
+      audioRef.current.play().catch(err => {
+        console.error('Error playing preview:', err);
+        // Fallback to Spotify if preview fails
+        window.open(track.external_url, '_blank');
+      });
+      
+      audioRef.current.onended = () => {
+        setCurrentPlaying(null);
+      };
+      
+      setCurrentPlaying(track.id);
+    }
+  };
+
+  const openInSpotify = (url: string) => {
+    window.open(url, '_blank');
+  };
+
   const formatDuration = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -154,7 +200,7 @@ export default function SpotifyAnalytics() {
   if (loading) {
     return (
       <Column fillWidth gap="xl" paddingY="24" horizontal="center">
-        <Text variant="heading-strong-xl">Loading your music analytics...</Text>
+        <Text variant="heading-strong-xl">Loading my music analytics...</Text>
       </Column>
     );
   }
@@ -182,7 +228,7 @@ export default function SpotifyAnalytics() {
       <Column fillWidth gap="xl" paddingY="24" horizontal="center">
         <Text variant="heading-strong-xl">No Spotify data available</Text>
         <Text variant="body-default-l" onBackground="neutral-weak">
-          Unable to load your Spotify listening data. This might be due to:
+          Unable to load my Spotify listening data. This might be due to:
         </Text>
         <Column gap="8" paddingX="24">
           <Text variant="body-default-m" onBackground="neutral-weak">• Expired Spotify refresh token</Text>
@@ -209,7 +255,7 @@ export default function SpotifyAnalytics() {
             <Heading variant="heading-strong-xl">Spotify Analytics</Heading>
           </Row>
           <Text variant="body-default-l" onBackground="neutral-weak">
-            Deep dive into your music listening patterns and preferences
+            Deep dive into my music listening patterns and preferences
           </Text>
         </Column>
 
@@ -272,9 +318,9 @@ export default function SpotifyAnalytics() {
       {stats && (
         <Card padding="24" radius="l" background="surface">
           <Column gap="16">
-            <Heading variant="heading-strong-l">Your Music DNA</Heading>
+            <Heading variant="heading-strong-l">My Music DNA</Heading>
             <Text variant="body-default-m" onBackground="neutral-weak">
-              Based on audio features of your top tracks
+              Based on audio features of my top tracks
             </Text>
             <Row fillWidth gap="24" wrap>
               {Object.entries(stats.music_dna).map(([feature, value]) => (
@@ -330,7 +376,7 @@ export default function SpotifyAnalytics() {
       {/* Top Tracks */}
       <Card padding="24" radius="l" background="surface">
         <Column gap="16">
-          <Heading variant="heading-strong-l">Your Top Tracks</Heading>
+          <Heading variant="heading-strong-l">My Top Tracks</Heading>
           <Column gap="8">
             {tracks.slice(0, 10).map((track, index) => (
               <Card 
@@ -345,11 +391,33 @@ export default function SpotifyAnalytics() {
                     #{index + 1}
                   </Text>
                   {track.image && (
-                    <img 
-                      src={track.image} 
-                      alt={track.album}
-                      style={{ width: '40px', height: '40px', borderRadius: '4px' }}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <img 
+                        src={track.image} 
+                        alt={track.album}
+                        style={{ width: '40px', height: '40px', borderRadius: '4px' }}
+                      />
+                      <Button
+                        onClick={() => playPreview(track)}
+                        variant="primary"
+                        size="s"
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '24px',
+                          height: '24px',
+                          minWidth: '24px',
+                          padding: '0',
+                          opacity: 0,
+                          transition: 'opacity 0.2s ease'
+                        }}
+                        className={styles.playButton}
+                      >
+                        {currentPlaying === track.id ? <FaPause size={10} /> : <FaPlay size={10} />}
+                      </Button>
+                    </div>
                   )}
                   <Column flex={1} gap="4">
                     <Text variant="body-strong-m">{track.name}</Text>
@@ -357,12 +425,22 @@ export default function SpotifyAnalytics() {
                       {track.artist} • {track.album}
                     </Text>
                   </Column>
-                  <Column gap="4" horizontal="end">
-                    <Text variant="body-default-s">{formatDuration(track.duration_ms)}</Text>
-                    <Text variant="body-default-xs" onBackground="neutral-weak">
-                      {formatPopularity(track.popularity)} popularity
-                    </Text>
-                  </Column>
+                  <Row gap="8" vertical="center">
+                    <Column gap="4" horizontal="end">
+                      <Text variant="body-default-s">{formatDuration(track.duration_ms)}</Text>
+                      <Text variant="body-default-xs" onBackground="neutral-weak">
+                        {formatPopularity(track.popularity)} popularity
+                      </Text>
+                    </Column>
+                    <Button
+                      onClick={() => openInSpotify(track.external_url)}
+                      variant="tertiary"
+                      size="s"
+                      style={{ minWidth: '32px' }}
+                    >
+                      <FaExternalLinkAlt size={12} />
+                    </Button>
+                  </Row>
                 </Row>
               </Card>
             ))}
@@ -373,7 +451,7 @@ export default function SpotifyAnalytics() {
       {/* Top Artists */}
       <Card padding="24" radius="l" background="surface">
         <Column gap="16">
-          <Heading variant="heading-strong-l">Your Top Artists</Heading>
+          <Heading variant="heading-strong-l">My Top Artists</Heading>
           <Row fillWidth gap="12" wrap>
             {artists.slice(0, 12).map((artist) => (
               <Card
