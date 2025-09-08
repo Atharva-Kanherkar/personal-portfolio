@@ -30,11 +30,14 @@ export async function GET(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Get top tracks and artists for calculations
+    // Get top tracks and artists for calculations (reduced limits to avoid rate limiting)
     const [topTracks, topArtists] = await Promise.all([
-      spotifyApi.getMyTopTracks({ limit: 20, time_range: timeRange }),
-      spotifyApi.getMyTopArtists({ limit: 20, time_range: timeRange })
+      spotifyApi.getMyTopTracks({ limit: 10, time_range: timeRange }),
+      spotifyApi.getMyTopArtists({ limit: 10, time_range: timeRange })
     ]);
+
+    // Add a small delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     // Check if we have data
     if (!topTracks.body.items || topTracks.body.items.length === 0) {
@@ -93,19 +96,55 @@ export async function GET(request: NextRequest) {
       .slice(0, 10)
       .map(([genre, count]) => ({ genre, count }));
 
-    // Get audio features for top tracks to calculate music DNA
-    const trackIds = topTracks.body.items.slice(0, 10).map(track => track.id);
-    const audioFeatures = await spotifyApi.getAudioFeaturesForTracks(trackIds);
+    // Get audio features for top tracks to calculate music DNA (reduced to 5 tracks)
+    const trackIds = topTracks.body.items.slice(0, 5).map(track => track.id);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let audioFeatures: any;
+    try {
+      audioFeatures = await spotifyApi.getAudioFeaturesForTracks(trackIds);
+    } catch (audioError) {
+      console.error('Error getting audio features:', audioError);
+      // Return stats without music DNA if audio features fail
+      const stats = {
+        total_tracks: topTracks.body.items.length,
+        total_artists: topArtists.body.items.length,
+        total_listening_time_ms: totalListeningTime,
+        unique_genres: uniqueGenres.length,
+        top_genres: topGenres,
+        average_track_popularity: Math.round(averageTrackPopularity),
+        average_artist_popularity: Math.round(averageArtistPopularity),
+        music_dna: {
+          danceability: 0,
+          energy: 0,
+          valence: 0,
+          acousticness: 0,
+          instrumentalness: 0,
+          speechiness: 0,
+        },
+        time_range_label: timeRange === 'short_term' ? 'Last 4 weeks' : 
+                         timeRange === 'medium_term' ? 'Last 6 months' : 
+                         'All time',
+      };
+      return NextResponse.json({ stats });
+    }
 
     // Calculate average audio features (Music DNA)
-    const validFeatures = audioFeatures.body.audio_features.filter(features => features !== null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const validFeatures = audioFeatures.body.audio_features.filter((features: any) => features !== null);
     const averageFeatures = {
-      danceability: validFeatures.reduce((sum, features) => sum + features.danceability, 0) / validFeatures.length,
-      energy: validFeatures.reduce((sum, features) => sum + features.energy, 0) / validFeatures.length,
-      valence: validFeatures.reduce((sum, features) => sum + features.valence, 0) / validFeatures.length,
-      acousticness: validFeatures.reduce((sum, features) => sum + features.acousticness, 0) / validFeatures.length,
-      instrumentalness: validFeatures.reduce((sum, features) => sum + features.instrumentalness, 0) / validFeatures.length,
-      speechiness: validFeatures.reduce((sum, features) => sum + features.speechiness, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      danceability: validFeatures.reduce((sum: number, features: any) => sum + features.danceability, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      energy: validFeatures.reduce((sum: number, features: any) => sum + features.energy, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      valence: validFeatures.reduce((sum: number, features: any) => sum + features.valence, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      acousticness: validFeatures.reduce((sum: number, features: any) => sum + features.acousticness, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      instrumentalness: validFeatures.reduce((sum: number, features: any) => sum + features.instrumentalness, 0) / validFeatures.length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      speechiness: validFeatures.reduce((sum: number, features: any) => sum + features.speechiness, 0) / validFeatures.length,
     };
 
     const stats = {
