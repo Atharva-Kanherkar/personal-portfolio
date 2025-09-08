@@ -96,8 +96,7 @@ const about: About = {
   },
   work: {
   display: true,
-  title: "Work Experience",
-  description: `Engineering projects and open source contributions by ${person.name}`, 
+  title: "Work Experience", 
   experiences: [
     {
       company: "Rimo LLC, Tokyo",
