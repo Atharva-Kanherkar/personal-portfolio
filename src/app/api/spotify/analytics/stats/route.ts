@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
 
     // Get top tracks and artists for calculations
     const [topTracks, topArtists] = await Promise.all([
-      spotifyApi.getMyTopTracks({ limit: 50, time_range: timeRange }),
-      spotifyApi.getMyTopArtists({ limit: 50, time_range: timeRange })
+      spotifyApi.getMyTopTracks({ limit: 20, time_range: timeRange }),
+      spotifyApi.getMyTopArtists({ limit: 20, time_range: timeRange })
     ]);
 
     // Check if we have data
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       .map(([genre, count]) => ({ genre, count }));
 
     // Get audio features for top tracks to calculate music DNA
-    const trackIds = topTracks.body.items.slice(0, 20).map(track => track.id);
+    const trackIds = topTracks.body.items.slice(0, 10).map(track => track.id);
     const audioFeatures = await spotifyApi.getAudioFeaturesForTracks(trackIds);
 
     // Calculate average audio features (Music DNA)

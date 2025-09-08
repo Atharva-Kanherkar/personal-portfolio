@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Get top artists for the specified time range
     const topArtists = await spotifyApi.getMyTopArtists({ 
-      limit: 50, 
+      limit: 20, 
       time_range: timeRange 
     });
 

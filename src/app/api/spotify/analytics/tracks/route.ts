@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     // Get top tracks for the specified time range
     const topTracks = await spotifyApi.getMyTopTracks({ 
-      limit: 50, 
+      limit: 20, 
       time_range: timeRange 
     });
 
