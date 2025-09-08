@@ -38,7 +38,9 @@ interface Playlist {
   description: string;
   image: string;
   external_url: string;
-  tracks: { total: number };
+  tracks_total: number;
+  public: boolean;
+  owner: string;
 }
 
 interface CurrentlyPlaying {
@@ -300,13 +302,13 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
     }
 
     if (currentPlaying === track.id) {
-      console.log('⏸️ PAUSING current track');
+      console.log('PAUSING current track');
       if (audioRef.current) {
         audioRef.current.pause();
       }
       setCurrentPlaying(null);
     } else {
-      console.log('▶️ PLAYING preview on your website');
+      console.log('PLAYING preview on your website');
       
       // Stop any currently playing track
       if (audioRef.current) {
@@ -319,7 +321,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         audioRef.current.volume = 0.7;
         
         // Add loading state
-        console.log('🎵 Loading audio...');
+        console.log('Loading audio...');
         
         audioRef.current.play().then(() => {
           console.log('✅ SUCCESS - Audio playing on your website!');
@@ -673,8 +675,8 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                       }
                       title={
                         track.preview_url ? 
-                          '▶️ Play 30-second preview directly on this website' : 
-                          '🎵 No preview available - will open in Spotify app'
+                          'Play 30-second preview directly on this website' : 
+                          'No preview available - will open in Spotify app'
                       }
                     >
                       {currentPlaying === track.id ? (
@@ -696,7 +698,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                     </Text>
                     <Text variant="body-default-s" onBackground="neutral-weak">
                       {track.album} • {formatDuration(track.duration_ms)}
-                      {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• ▶️ Preview available</span>}
+                      {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• Preview available</span>}
                     </Text>
                   </Column>
 
@@ -758,7 +760,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                       </Text>
                       <Text variant="body-default-s" onBackground="neutral-weak">
                         {track.album} • {formatDuration(track.duration_ms)}
-                        {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• ▶️ Preview available</span>}
+                        {track.preview_url && <span style={{ color: '#1DB954', marginLeft: '8px' }}>• Preview available</span>}
                       </Text>
                     </Column>
                     <Button
@@ -814,7 +816,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                         {playlist.name}
                       </Text>
                       <Text variant="body-default-m" onBackground="neutral-weak">
-                        {playlist.tracks.total} tracks
+                        {playlist.tracks_total} tracks
                       </Text>
                       <Text variant="body-default-s" onBackground="neutral-weak">
                         {playlist.description || 'No description'}
@@ -884,7 +886,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                       </Text>
                       <Row gap="8" vertical="center">
                         <Text variant="label-default-s" onBackground="brand-weak">
-                          {currentlyPlayingTrack.is_playing ? '▶️ Playing' : '⏸️ Paused'}
+                          {currentlyPlayingTrack.is_playing ? 'Playing' : 'Paused'}
                         </Text>
                         <Text variant="label-default-s" onBackground="brand-weak">
                           •
