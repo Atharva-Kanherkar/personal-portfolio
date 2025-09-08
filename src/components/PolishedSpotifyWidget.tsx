@@ -248,10 +248,10 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
   const fetchCurrentlyPlaying = async () => {
     setTabLoading(prev => ({ ...prev, 'currently-playing': true }));
     try {
-      const response = await fetch('/api/spotify/current-playing');
+      const response = await fetch('/api/spotify/currently-playing');
       if (response.ok) {
         const data = await response.json();
-        setCurrentlyPlayingTrack(data.currentlyPlaying || null);
+        setCurrentlyPlayingTrack(data.currentTrack || null);
       }
     } catch (err) {
       console.error('Error fetching currently playing:', err);
@@ -288,7 +288,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
     
     // Check if preview URL exists and is valid
     if (!track.preview_url || track.preview_url === null || track.preview_url.trim() === '') {
-      console.log('❌ NO PREVIEW AVAILABLE - This track has no 30-second preview');
+      console.log('NO PREVIEW AVAILABLE - This track has no 30-second preview');
       
       // Instead of opening Spotify immediately, show user a message
       const userWantsSpotify = confirm(
@@ -324,7 +324,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         console.log('Loading audio...');
         
         audioRef.current.play().then(() => {
-          console.log('✅ SUCCESS - Audio playing on your website!');
+          console.log('SUCCESS - Audio playing on your website!');
           setCurrentPlaying(track.id);
         }).catch((error) => {
           console.error('❌ AUDIO PLAY FAILED:', error);
@@ -336,7 +336,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         
         // Auto-stop when preview ends
         audioRef.current.onended = () => {
-          console.log('🔚 Preview ended');
+          console.log('Preview ended');
           setCurrentPlaying(null);
         };
         
@@ -608,14 +608,6 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
         </Card>
       )}
 
-      {/* Status indicator for Spotify connection */}
-      {profile && !isSpotifyReady && (
-        <Row fillWidth horizontal="center">
-          <Text variant="label-default-s" onBackground="neutral-weak">
-            💡 Spotify Premium required for full playback control • Preview mode active
-          </Text>
-        </Row>
-      )}
 
       {/* Beautiful Tabs Navigation */}
       <Row fillWidth gap="8" horizontal="center" className={styles.tabsContainer}>
@@ -646,9 +638,8 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
       {/* Dynamic Content Based on Active Tab */}
       <Column fillWidth gap="16">
         {/* Top Tracks Tab */}
-        {activeTab === 'top-tracks' && (
-          <>
-            {tracks.slice(0, 6).map((track) => (
+        {activeTab === 'top-tracks' && 
+            tracks.slice(0, 6).map((track) => (
               <Card
                 key={track.id}
                 fillWidth
@@ -714,14 +705,12 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                   </Button>
                 </Row>
               </Card>
-            ))}
-          </>
-        )}
+            ))
+        }
 
         {/* Recent Tracks Tab */}
         {activeTab === 'recent-tracks' && (
-          <>
-            {tabLoading['recent-tracks'] ? (
+            tabLoading['recent-tracks'] ? (
               <Row fillWidth horizontal="center" paddingY="40">
                 <Text variant="body-default-m">Loading recent tracks...</Text>
               </Row>
@@ -781,14 +770,13 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                   No recent tracks found
                 </Text>
               </Row>
-            )}
-          </>
+            )
         )}
 
         {/* Playlists Tab */}
         {activeTab === 'playlists' && (
-          <>
-            {tabLoading['playlists'] ? (
+            // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+            tabLoading['playlists'] ? (
               <Row fillWidth horizontal="center" paddingY="40">
                 <Text variant="body-default-m">Loading playlists...</Text>
               </Row>
@@ -840,14 +828,12 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                   No playlists found
                 </Text>
               </Row>
-            )}
-          </>
+            )
         )}
 
         {/* Currently Playing Tab */}
         {activeTab === 'currently-playing' && (
-          <>
-            {tabLoading['currently-playing'] ? (
+            tabLoading['currently-playing'] ? (
               <Row fillWidth horizontal="center" paddingY="40">
                 <Text variant="body-default-m">Checking what's playing...</Text>
               </Row>
@@ -922,8 +908,7 @@ export const PolishedSpotifyWidget: React.FC<PolishedSpotifyWidgetProps> = ({ cl
                   </Text>
                 </Column>
               </Row>
-            )}
-          </>
+            )
         )}
       </Column>
 
