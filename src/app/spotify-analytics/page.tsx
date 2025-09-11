@@ -361,7 +361,7 @@ export default function SpotifyAnalytics() {
                 </Row>
               </Row>
             </Card>
-          ))
+        ))
         }
 
         {/* Artists Tab */}
@@ -388,7 +388,7 @@ export default function SpotifyAnalytics() {
                         objectFit: 'cover'
                       }}
                     />
-                  )}
+                )}
                   <Column gap="4" flex={1}>
                     <Text variant="body-strong-m">
                       {artist.name}
@@ -416,7 +416,7 @@ export default function SpotifyAnalytics() {
                 </Row>
               </Row>
             </Card>
-          ))
+        ))
         }
       </Column>
     </Column>
@@ -472,20 +472,20 @@ export default function SpotifyAnalytics() {
                             </Text>
                           </Row>
                         </Card>
-                      ))}
+                    ))}
                     </Row>
                   </Column>
                 </Card>
-              )}
+            )}
             </Column>
-          ) : (
+        ) : (
             <Column fillWidth gap="20" horizontal="center" paddingY="40">
               <Text variant="heading-strong-m">Loading Stats...</Text>
               <Text variant="body-default-m" onBackground="neutral-weak">
                 Fetching your listening statistics...
               </Text>
             </Column>
-          )
+        )
         )}
 
         {/* Music DNA Tab */}
@@ -523,18 +523,18 @@ export default function SpotifyAnalytics() {
                         {getAudioFeatureDescription(feature, value)}
                       </Text>
                     </Column>
-                  ))}
+                ))}
                 </Row>
               </Column>
             </Card>
-          ) : (
+        ) : (
             <Column fillWidth gap="20" horizontal="center" paddingY="40">
               <Text variant="heading-strong-m">Loading Music DNA...</Text>
               <Text variant="body-default-m" onBackground="neutral-weak">
                 Analyzing your audio features...
               </Text>
             </Column>
-          )
+        )
         )}
       </Column>
     </Column>
