@@ -46,7 +46,9 @@ export async function generateMetadata({
 
   // Use cover image if it exists, otherwise use generated OG image
   const coverImage = post.metadata.images?.[0]?.src || post.metadata.image;
-  const ogImage = coverImage || `/api/og/generate?title=${post.metadata.title}`;
+  const ogImage = coverImage
+    ? `${baseURL}${coverImage}`
+    : `/api/og/generate?title=${post.metadata.title}`;
 
   return Meta.generate({
     title: post.metadata.title,
@@ -76,7 +78,9 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
 
   // Use cover image if it exists, otherwise use generated OG image
   const coverImage = post.metadata.images?.[0]?.src || post.metadata.image;
-  const ogImage = coverImage || `/api/og/generate?title=${encodeURIComponent(post.metadata.title)}`;
+  const ogImage = coverImage
+    ? `${baseURL}${coverImage}`
+    : `/api/og/generate?title=${encodeURIComponent(post.metadata.title)}`;
 
   return (
     <Row fillWidth>
