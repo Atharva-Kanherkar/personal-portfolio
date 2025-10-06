@@ -44,11 +44,15 @@ export async function generateMetadata({
 
   if (!post) return {};
 
+  // Use cover image if it exists, otherwise use generated OG image
+  const coverImage = post.metadata.images?.[0]?.src || post.metadata.image;
+  const ogImage = coverImage || `/api/og/generate?title=${post.metadata.title}`;
+
   return Meta.generate({
     title: post.metadata.title,
     description: post.metadata.summary,
     baseURL: baseURL,
-    image: post.metadata.image || `/api/og/generate?title=${post.metadata.title}`,
+    image: ogImage,
     path: `${blog.path}/${post.slug}`,
   });
 }
@@ -70,6 +74,10 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       src: person.avatar,
     })) || [];
 
+  // Use cover image if it exists, otherwise use generated OG image
+  const coverImage = post.metadata.images?.[0]?.src || post.metadata.image;
+  const ogImage = coverImage || `/api/og/generate?title=${encodeURIComponent(post.metadata.title)}`;
+
   return (
     <Row fillWidth>
       <Row maxWidth={12} m={{ hide: true }} />
@@ -83,10 +91,7 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
             description={post.metadata.summary}
             datePublished={post.metadata.publishedAt}
             dateModified={post.metadata.publishedAt}
-            image={
-              post.metadata.image ||
-              `/api/og/generate?title=${encodeURIComponent(post.metadata.title)}`
-            }
+            image={ogImage}
             author={{
               name: person.name,
               url: `${baseURL}${about.path}`,
@@ -110,10 +115,10 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
               </Text>
             </Row>
           </Row>
-          {post.metadata.image && (
+          {coverImage && (
             <Media
-              src={post.metadata.image}
-              alt={post.metadata.title}
+              src={coverImage}
+              alt={post.metadata.images?.[0]?.alt || post.metadata.title}
               aspectRatio="16/9"
               priority
               sizes="(min-width: 768px) 100vw, 768px"
