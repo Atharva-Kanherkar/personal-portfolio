@@ -49,7 +49,8 @@ export function Posts({
       { name: "Technology", slug: "tech" },
       { name: "Literature", slug: "literature" },
       { name: "Philosophy", slug: "philosophy" },
-      { name: "Hip Hop", slug: "hiphop" }
+      { name: "Hip Hop", slug: "hiphop" },
+      { name: "Poetry", slug: "poetry" }
     ];
 
     // Check if any posts have categories
