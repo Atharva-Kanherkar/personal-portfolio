@@ -29,22 +29,19 @@ export default function Blog() {
           image: `${baseURL}${person.avatar}`,
         }}
       />
-      <Heading marginBottom="l" variant="heading-strong-xl" marginLeft="24">
-        {blog.title}
-      </Heading>
-      
-      {/* Show latest posts from all categories */}
-      <Column fillWidth flex={1} gap="40">
-        <Posts range={[1, 2]} thumbnail />
-        
+      <Column fillWidth gap="8" marginBottom="xl" paddingX="l">
+        <Heading variant="heading-strong-xl">
+          {blog.title}
+        </Heading>
+        <Heading as="p" variant="body-default-l" onBackground="neutral-weak" wrap="balance">
+          {blog.description}
+        </Heading>
+      </Column>
+
+      <Column fillWidth flex={1} gap="xl">
         {/* Show posts organized by categories */}
-        <Column fillWidth gap="40">
-          <Heading as="h2" variant="heading-strong-xl" marginLeft="l">
-            Explore by Interest
-          </Heading>
-          <Posts showCategories={true} thumbnail columns="2" />
-        </Column>
-        
+        <Posts showCategories={true} thumbnail columns="2" />
+
         <Mailchimp marginBottom="l" />
       </Column>
     </Column>
