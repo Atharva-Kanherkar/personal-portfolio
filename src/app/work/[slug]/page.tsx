@@ -43,11 +43,15 @@ export async function generateMetadata({
 
   if (!post) return {};
 
+  // Use cover image if it exists, otherwise use generated OG image
+  const coverImage = post.metadata.images?.[0]?.src || post.metadata.image;
+  const ogImage = coverImage || `/api/og/generate?title=${post.metadata.title}`;
+
   return Meta.generate({
     title: post.metadata.title,
     description: post.metadata.summary,
     baseURL: baseURL,
-    image: post.metadata.image || `/api/og/generate?title=${post.metadata.title}`,
+    image: ogImage,
     path: `${work.path}/${post.slug}`,
   });
 }
@@ -118,8 +122,8 @@ export default async function Project({
           </Text>
         </Row>
       </Row>
-      {post.metadata.images.length > 0 && (
-        <Media priority aspectRatio="16 / 9" radius="m" alt="image" src={post.metadata.images[0]} />
+      {post.metadata.images && post.metadata.images.length > 0 && (
+        <Media priority aspectRatio="16 / 9" radius="m" alt="image" src={post.metadata.images[0].src} />
       )}
       <Column style={{ margin: "auto" }} as="article" maxWidth="xs">
         <CustomMDX source={post.content} />
