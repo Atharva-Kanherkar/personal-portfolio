@@ -7,6 +7,17 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const body = await request.json();
+    const { password } = body;
+
+    // Check admin password
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword || password !== adminPassword) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid admin password' },
+        { status: 401 }
+      );
+    }
 
     await prisma.comment.delete({
       where: { id },

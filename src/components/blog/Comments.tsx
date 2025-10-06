@@ -23,6 +23,7 @@ export function Comments({ postSlug }: CommentsProps) {
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     fetchComments();
@@ -68,6 +69,34 @@ export function Comments({ postSlug }: CommentsProps) {
       setMessage({ type: "error", text: "Failed to post comment. Please try again." });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (commentId: string) => {
+    const password = prompt("Enter admin password to delete this comment:");
+    if (!password) return;
+
+    setDeleting(commentId);
+
+    try {
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ type: "success", text: "Comment deleted successfully" });
+        fetchComments();
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to delete comment" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to delete comment. Please try again." });
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -162,9 +191,19 @@ export function Comments({ postSlug }: CommentsProps) {
             >
               <Row fillWidth horizontal="between" vertical="center">
                 <Text variant="label-strong-m">{comment.author}</Text>
-                <Text variant="body-default-xs" onBackground="neutral-weak">
-                  {formatDate(comment.createdAt, false)}
-                </Text>
+                <Row gap="12" vertical="center">
+                  <Text variant="body-default-xs" onBackground="neutral-weak">
+                    {formatDate(comment.createdAt, false)}
+                  </Text>
+                  <Button
+                    size="s"
+                    variant="tertiary"
+                    onClick={() => handleDelete(comment.id)}
+                    disabled={deleting === comment.id}
+                  >
+                    {deleting === comment.id ? "Deleting..." : "Delete"}
+                  </Button>
+                </Row>
               </Row>
               <Text variant="body-default-m" style={{ whiteSpace: "pre-wrap" }}>
                 {comment.content}
