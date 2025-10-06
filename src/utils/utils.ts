@@ -9,13 +9,20 @@ type Team = {
   linkedIn: string;
 };
 
+type ImageMetadata = {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+};
+
 type Metadata = {
   category: string;
   title: string;
   publishedAt: string;
   summary: string;
   image?: string;
-  images: string[];
+  images?: ImageMetadata[];
   tag?: string;
   team: Team[];
   link?: string;
