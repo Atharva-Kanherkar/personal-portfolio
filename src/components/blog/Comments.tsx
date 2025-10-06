@@ -94,7 +94,6 @@ export function Comments({ postSlug }: CommentsProps) {
 
         <Input
           id="author"
-          label="Your name"
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
           required
@@ -103,9 +102,6 @@ export function Comments({ postSlug }: CommentsProps) {
         />
 
         <Column fillWidth gap="4">
-          <Text as="label" htmlFor="content" variant="label-default-s" onBackground="neutral-weak">
-            Comment
-          </Text>
           <textarea
             id="content"
             value={content}
