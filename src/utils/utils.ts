@@ -1,22 +1,23 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { notFound } from "next/navigation";
 
-type Team = {
+export type Team = {
   name: string;
   role: string;
   avatar: string;
   linkedIn: string;
 };
 
-type ImageMetadata = {
+export type ImageMetadata = {
   src: string;
   alt: string;
   width?: number;
   height?: number;
 };
 
-type Metadata = {
+export type Metadata = {
   category: string;
   title: string;
   publishedAt: string;
@@ -28,7 +29,11 @@ type Metadata = {
   link?: string;
 };
 
-import { notFound } from "next/navigation";
+export type Post = {
+  metadata: Metadata;
+  slug: string;
+  content: string;
+};
 
 function getMDXFiles(dir: string) {
   if (!fs.existsSync(dir)) {
@@ -38,7 +43,7 @@ function getMDXFiles(dir: string) {
   return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
 }
 
-function readMDXFile(filePath: string) {
+function readMDXFile(filePath: string): { metadata: Metadata; content: string } {
   if (!fs.existsSync(filePath)) {
     notFound();
   }
@@ -52,7 +57,7 @@ function readMDXFile(filePath: string) {
     publishedAt: data.publishedAt,
     summary: data.summary || "",
     image: data.image,
-    images: data.images,
+    images: data.images as ImageMetadata[] | undefined,
     tag: data.tag,
     team: data.team || [],
     link: data.link,
@@ -61,7 +66,7 @@ function readMDXFile(filePath: string) {
   return { metadata, content };
 }
 
-function getMDXData(dir: string) {
+function getMDXData(dir: string): Post[] {
   const mdxFiles = getMDXFiles(dir);
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file));
@@ -75,7 +80,7 @@ function getMDXData(dir: string) {
   });
 }
 
-export function getPosts(customPath = ["", "", "", ""]) {
+export function getPosts(customPath = ["", "", "", ""]): Post[] {
   const postsDir = path.join(process.cwd(), ...customPath);
   return getMDXData(postsDir);
 }
