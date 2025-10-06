@@ -51,11 +51,11 @@ function readMDXFile(filePath: string) {
     title: data.title || "",
     publishedAt: data.publishedAt,
     summary: data.summary || "",
-    image: data.image || "",
-    images: data.images || [],
-    tag: data.tag || [],
+    image: data.image,
+    images: data.images,
+    tag: data.tag,
     team: data.team || [],
-    link: data.link || "",
+    link: data.link,
   };
 
   return { metadata, content };
