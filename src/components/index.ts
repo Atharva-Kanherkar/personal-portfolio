@@ -11,4 +11,4 @@ export { CustomMDX } from "@/components/mdx";
 export { SpotifyWidget } from "@/components/SpotifyWidget";
 export { PolishedSpotifyWidget } from "@/components/PolishedSpotifyWidget";
 export { EnhancedSpotifyWidget } from "@/components/EnhancedSpotifyWidget";
-export { ChatInterface } from "@/components/ChatInterface";
+export { ChatWidget } from "@/components/ChatWidget";

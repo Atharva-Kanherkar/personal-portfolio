@@ -12,7 +12,7 @@ import {
   Line,
 } from "@once-ui-system/core";
 import { home, about, person, baseURL } from "@/resources";
-import { Mailchimp, PolishedSpotifyWidget, ChatInterface } from "@/components";
+import { Mailchimp, PolishedSpotifyWidget, ChatWidget } from "@/components";
 import { Projects } from "@/components/work/Projects";
 
 export async function generateMetadata() {
@@ -115,13 +115,13 @@ export default function Home() {
         <Projects range={[1, 10]} exclude={["chainarena", "workflows4s", "lfxomp"]} />
       </RevealFx>
 
-      {/* Chat Interface Section - Replacing Blog Section */}
+      {/* Chat Widget - Opens Full Chat Page */}
       <RevealFx translateY="16" delay={1.2} fillWidth>
         <Column fillWidth gap="24" marginBottom="xl">
           <Row fillWidth paddingRight="64">
             <Line maxWidth={48} />
           </Row>
-          <ChatInterface />
+          <ChatWidget />
           <Row fillWidth paddingLeft="64" horizontal="end">
             <Line maxWidth={48} />
           </Row>

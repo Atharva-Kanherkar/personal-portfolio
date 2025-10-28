@@ -20,6 +20,7 @@ const routes: RoutesConfig = {
   "/about": true,
   "/work": true,
   "/blog": true,
+  "/chat": true,
   "/gallery": false,
   "/spotify-setup": true,
   "/spotify-analytics": true,
