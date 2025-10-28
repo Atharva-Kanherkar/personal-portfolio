@@ -12,7 +12,7 @@ import {
   Line,
 } from "@once-ui-system/core";
 import { home, about, person, baseURL, routes } from "@/resources";
-import { Mailchimp, PolishedSpotifyWidget } from "@/components";
+import { Mailchimp, PolishedSpotifyWidget, ChatInterface } from "@/components";
 import { Projects } from "@/components/work/Projects";
 import { Posts } from "@/components/blog/Posts";
 import { Terminal } from "@/components/Terminal";
@@ -151,7 +151,20 @@ export default function Home() {
           </Row>
         </Column>
       </RevealFx>
-      
+
+      {/* Chat Interface Section */}
+      <RevealFx translateY="16" delay={0.6} fillWidth>
+        <Column fillWidth gap="24" marginBottom="xl">
+          <Row fillWidth paddingRight="64">
+            <Line maxWidth={48} />
+          </Row>
+          <ChatInterface />
+          <Row fillWidth paddingLeft="64" horizontal="end">
+            <Line maxWidth={48} />
+          </Row>
+        </Column>
+      </RevealFx>
+
       <Mailchimp />
     </Column>
   );
