@@ -89,7 +89,9 @@ export default function ChatPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get response");
+        const errorText = await response.text();
+        console.error("API Error:", response.status, errorText);
+        throw new Error(errorText || "Failed to get response");
       }
 
       const reader = response.body?.getReader();
@@ -138,13 +140,17 @@ export default function ChatPage() {
     } catch (error) {
       console.error("Chat error:", error);
 
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Sorry, I'm having trouble responding right now. Try again in a moment!";
+
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === assistantMessageId
             ? {
                 ...msg,
-                content:
-                  "Sorry, I'm having trouble responding right now. Try again in a moment!",
+                content: errorMessage,
               }
             : msg
         )

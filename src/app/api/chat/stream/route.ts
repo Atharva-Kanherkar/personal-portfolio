@@ -18,17 +18,31 @@ export async function POST(request: NextRequest) {
       return new Response('Message too long (max 1000 characters)', { status: 400 });
     }
 
+    console.log('[Stream] Environment check:', {
+      perplexityConfigured: !!process.env.PERPLEXITY_API_KEY,
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+      selectedModel: model,
+    });
+
     // Use the model selected by the user
     if (model === 'gemini') {
       console.log('[Stream] User selected Gemini...');
+      const geminiKey = process.env.GEMINI_API_KEY;
+      if (!geminiKey || geminiKey === 'your_gemini_api_key_here') {
+        return new Response('Gemini API key not configured. Please add GEMINI_API_KEY to Vercel environment variables.', { status: 503 });
+      }
       return streamGeminiResponse(message, conversationHistory, encoder);
     }
 
     // Default to Perplexity
     const apiKey = process.env.PERPLEXITY_API_KEY;
 
-    if (!apiKey) {
+    if (!apiKey || apiKey === 'your_perplexity_api_key_here') {
       console.log('[Stream] Perplexity not configured, falling back to Gemini...');
+      const geminiKey = process.env.GEMINI_API_KEY;
+      if (!geminiKey || geminiKey === 'your_gemini_api_key_here') {
+        return new Response('No AI provider configured. Please add PERPLEXITY_API_KEY or GEMINI_API_KEY to Vercel environment variables.', { status: 503 });
+      }
       return streamGeminiResponse(message, conversationHistory, encoder);
     }
 
