@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+type AIProvider = 'perplexity' | 'gemini';
+
 // System prompt that captures Atharva's personality and knowledge
 const SYSTEM_PROMPT = `You are Atharva Kanherkar - a backend-focused fullstack developer, open source contributor, and thoughtful human being. You're having a casual conversation with someone visiting your portfolio website.
 
@@ -90,6 +92,151 @@ A: [Give a thoughtful, specific answer based on your actual experience. If it's 
 
 Remember: You're Atharva having a genuine conversation. Be yourself - thoughtful, pragmatic, helpful, and real.`;
 
+// Helper function to call Perplexity API
+async function callPerplexityAPI(
+  message: string,
+  conversationHistory: Array<{ role: string; content: string }>
+): Promise<{ success: boolean; response?: string; error?: string }> {
+  const apiKey = process.env.PERPLEXITY_API_KEY;
+
+  if (!apiKey) {
+    console.log('[Perplexity] API key not configured, skipping');
+    return { success: false, error: 'No API key' };
+  }
+
+  try {
+    console.log('[Perplexity] Attempting to call API...');
+
+    // Build messages array for Perplexity (OpenAI-compatible format)
+    const messages = [
+      {
+        role: 'system',
+        content: SYSTEM_PROMPT,
+      },
+      // Add conversation history
+      ...conversationHistory.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+      // Add current message
+      {
+        role: 'user',
+        content: message,
+      },
+    ];
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages,
+        temperature: 0.8,
+        max_tokens: 1024,
+        top_p: 0.95,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Perplexity] API error:', errorText);
+      return { success: false, error: `HTTP ${response.status}` };
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices?.[0]?.message?.content;
+
+    if (!aiResponse) {
+      console.error('[Perplexity] No response in data:', data);
+      return { success: false, error: 'No response content' };
+    }
+
+    console.log('[Perplexity] Success! Response received');
+    return { success: true, response: aiResponse };
+
+  } catch (error) {
+    console.error('[Perplexity] Exception:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+// Helper function to call Gemini API
+async function callGeminiAPI(
+  message: string,
+  conversationHistory: Array<{ role: string; content: string }>
+): Promise<{ success: boolean; response?: string; error?: string }> {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    console.log('[Gemini] API key not configured, skipping');
+    return { success: false, error: 'No API key' };
+  }
+
+  try {
+    console.log('[Gemini] Attempting to call API...');
+
+    // Build messages array for Gemini
+    const messages = [
+      // Add conversation history
+      ...conversationHistory.map((msg) => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      })),
+      // Add current message
+      {
+        role: 'user',
+        parts: [{ text: message }],
+      },
+    ];
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: messages,
+          generationConfig: {
+            temperature: 0.8,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          },
+          systemInstruction: {
+            parts: [{ text: SYSTEM_PROMPT }],
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Gemini] API error:', errorText);
+      return { success: false, error: `HTTP ${response.status}` };
+    }
+
+    const data = await response.json();
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!aiResponse) {
+      console.error('[Gemini] No response in data:', data);
+      return { success: false, error: 'No response content' };
+    }
+
+    console.log('[Gemini] Success! Response received');
+    return { success: true, response: aiResponse };
+
+  } catch (error) {
+    console.error('[Gemini] Exception:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -110,87 +257,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for API key
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'AI service not configured' },
-        { status: 503 }
-      );
+    // Try Perplexity first (primary provider)
+    console.log('\n--- Chat Request ---');
+    console.log('[System] Trying Perplexity (primary provider)...');
+    const perplexityResult = await callPerplexityAPI(message, conversationHistory);
+
+    if (perplexityResult.success && perplexityResult.response) {
+      console.log('[System] Using Perplexity response');
+      return NextResponse.json({
+        response: perplexityResult.response,
+        provider: 'perplexity' as AIProvider,
+        timestamp: new Date().toISOString(),
+      });
     }
 
-    // Build messages array for Gemini
-    const messages = [
-      {
-        role: 'user',
-        parts: [{ text: SYSTEM_PROMPT }],
-      },
-      {
-        role: 'model',
-        parts: [{ text: 'I understand. I am Atharva Kanherkar, and I will respond authentically as myself based on my experiences, projects, and personality. I will be conversational, specific, honest, and helpful.' }],
-      },
-      // Add conversation history
-      ...conversationHistory.map((msg: { role: string; content: string }) => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }],
-      })),
-      // Add current message
-      {
-        role: 'user',
-        parts: [{ text: message }],
-      },
-    ];
+    // Fallback to Gemini if Perplexity fails
+    console.log('[System] Perplexity failed, falling back to Gemini...');
+    const geminiResult = await callGeminiAPI(message, conversationHistory);
 
-    // Call Gemini API
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+    if (geminiResult.success && geminiResult.response) {
+      console.log('[System] Using Gemini response (fallback)');
+      return NextResponse.json({
+        response: geminiResult.response,
+        provider: 'gemini' as AIProvider,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Both providers failed
+    console.error('[System] Both providers failed');
+    console.error('Perplexity error:', perplexityResult.error);
+    console.error('Gemini error:', geminiResult.error);
+
+    return NextResponse.json(
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: messages.slice(2), // Skip system prompt and acknowledgment for Gemini
-          generationConfig: {
-            temperature: 0.8,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
-          systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-        }),
-      }
+        error: 'AI services temporarily unavailable. Please try again in a moment!',
+        details: {
+          perplexity: perplexityResult.error,
+          gemini: geminiResult.error,
+        }
+      },
+      { status: 503 }
     );
 
-    if (!response.ok) {
-      console.error('Gemini API error:', await response.text());
-      return NextResponse.json(
-        { error: 'AI service temporarily unavailable' },
-        { status: 503 }
-      );
-    }
-
-    const data = await response.json();
-
-    // Extract response text
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!aiResponse) {
-      return NextResponse.json(
-        { error: 'No response from AI service' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      response: aiResponse,
-      timestamp: new Date().toISOString(),
-    });
-
   } catch (error) {
-    console.error('Chat API error:', error);
+    console.error('[System] Chat API exception:', error);
     return NextResponse.json(
       { error: 'Failed to process chat message' },
       { status: 500 }

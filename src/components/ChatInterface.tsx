@@ -17,6 +17,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  provider?: "perplexity" | "gemini";
 }
 
 export const ChatInterface = () => {
@@ -88,6 +89,7 @@ export const ChatInterface = () => {
         role: "assistant",
         content: data.response,
         timestamp: new Date(data.timestamp),
+        provider: data.provider,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -129,7 +131,7 @@ export const ChatInterface = () => {
     <Column fillWidth className={styles.container}>
       <Row
         fillWidth
-        horizontal="space-between"
+        horizontal="between"
         vertical="center"
         className={styles.header}
         onClick={() => setIsExpanded(!isExpanded)}
@@ -150,7 +152,7 @@ export const ChatInterface = () => {
               icon="refresh"
               size="m"
               variant="ghost"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleClear();
               }}
@@ -161,7 +163,7 @@ export const ChatInterface = () => {
             icon={isExpanded ? "chevronDown" : "chevronUp"}
             size="m"
             variant="ghost"
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
@@ -179,22 +181,33 @@ export const ChatInterface = () => {
                 horizontal={message.role === "user" ? "end" : "start"}
                 className={styles.messageRow}
               >
-                <div
-                  className={`${styles.message} ${
-                    message.role === "user"
-                      ? styles.userMessage
-                      : styles.assistantMessage
-                  }`}
-                >
-                  <Text
-                    variant="body-default-s"
-                    onBackground={
-                      message.role === "user" ? "brand-weak" : "neutral-weak"
-                    }
+                <Column gap="4" fillWidth={false}>
+                  <div
+                    className={`${styles.message} ${
+                      message.role === "user"
+                        ? styles.userMessage
+                        : styles.assistantMessage
+                    }`}
                   >
-                    {message.content}
-                  </Text>
-                </div>
+                    <Text
+                      variant="body-default-s"
+                      onBackground={
+                        message.role === "user" ? "brand-weak" : "neutral-weak"
+                      }
+                    >
+                      {message.content}
+                    </Text>
+                  </div>
+                  {message.provider && (
+                    <Text
+                      variant="label-default-xs"
+                      onBackground="neutral-weak"
+                      className={styles.providerBadge}
+                    >
+                      {message.provider === "perplexity" ? "🟣 Perplexity" : "✨ Gemini"}
+                    </Text>
+                  )}
+                </Column>
               </Row>
             ))}
             {isLoading && (

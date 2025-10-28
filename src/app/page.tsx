@@ -11,11 +11,9 @@ import {
   Meta,
   Line,
 } from "@once-ui-system/core";
-import { home, about, person, baseURL, routes } from "@/resources";
+import { home, about, person, baseURL } from "@/resources";
 import { Mailchimp, PolishedSpotifyWidget, ChatInterface } from "@/components";
 import { Projects } from "@/components/work/Projects";
-import { Posts } from "@/components/blog/Posts";
-import { Terminal } from "@/components/Terminal";
 
 export async function generateMetadata() {
   return Meta.generate({
@@ -116,49 +114,27 @@ export default function Home() {
       <RevealFx translateY="16" delay={1.0}>
         <Projects range={[1, 10]} exclude={["chainarena", "workflows4s", "lfxomp"]} />
       </RevealFx>
-      
-      {/* Blog section */}
-      {routes["/blog"] && (
-        <Column fillWidth gap="24" marginBottom="l">
-          <Row fillWidth paddingRight="64">
-            <Line maxWidth={48} />
-          </Row>
-          <Row fillWidth gap="24" marginTop="40" s={{ direction: "column" }}>
-            <Row flex={1} paddingLeft="l" paddingTop="24">
-              <Heading as="h2" variant="display-strong-xs" wrap="balance">
-                Latest from the blog
-              </Heading>
-            </Row>
-            <Row flex={3} paddingX="20">
-              <Posts range={[1, 2]} columns="2" />
-            </Row>
-          </Row>
-          <Row fillWidth paddingLeft="64" horizontal="end">
-            <Line maxWidth={48} />
-          </Row>
-        </Column>
-      )}
-      
-      {/* Spotify Widget Section */}
-      <RevealFx translateY="16" delay={0.4} fillWidth>
+
+      {/* Chat Interface Section - Replacing Blog Section */}
+      <RevealFx translateY="16" delay={1.2} fillWidth>
         <Column fillWidth gap="24" marginBottom="xl">
           <Row fillWidth paddingRight="64">
             <Line maxWidth={48} />
           </Row>
-          <PolishedSpotifyWidget />
+          <ChatInterface />
           <Row fillWidth paddingLeft="64" horizontal="end">
             <Line maxWidth={48} />
           </Row>
         </Column>
       </RevealFx>
 
-      {/* Chat Interface Section */}
-      <RevealFx translateY="16" delay={0.6} fillWidth>
+      {/* Spotify Widget Section */}
+      <RevealFx translateY="16" delay={1.4} fillWidth>
         <Column fillWidth gap="24" marginBottom="xl">
           <Row fillWidth paddingRight="64">
             <Line maxWidth={48} />
           </Row>
-          <ChatInterface />
+          <PolishedSpotifyWidget />
           <Row fillWidth paddingLeft="64" horizontal="end">
             <Line maxWidth={48} />
           </Row>
