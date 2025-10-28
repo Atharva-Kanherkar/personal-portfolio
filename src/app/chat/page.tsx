@@ -191,13 +191,14 @@ export default function ChatPage() {
     >
       {/* Header */}
       <div
+        className="chat-header"
         style={{
           position: "sticky",
           top: 0,
           zIndex: 10,
           backdropFilter: "blur(24px)",
           borderBottom: "1px solid var(--neutral-alpha-weak)",
-          padding: "16px 24px",
+          padding: "12px 16px",
         }}
       >
         <div
@@ -207,26 +208,31 @@ export default function ChatPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "8px",
           }}
         >
-          <Link href="/" style={{ textDecoration: "none" }}>
+          <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
             <Button variant="tertiary" size="m" prefixIcon="arrowLeft">
-              Back
+              <span className="hide-mobile">Back</span>
             </Button>
           </Link>
 
-          <Text variant="heading-strong-s" onBackground="neutral-strong">
+          <Text
+            variant="heading-strong-s"
+            onBackground="neutral-strong"
+            className="chat-title"
+          >
             Chat with Atharva
           </Text>
 
           {/* Model Selector */}
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", flexShrink: 0 }}>
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value as ModelType)}
               className="model-selector"
               style={{
-                padding: "8px 32px 8px 12px",
+                padding: "8px 24px 8px 12px",
                 borderRadius: "var(--radius-m)",
                 background: "var(--neutral-alpha-weak)",
                 border: "1px solid var(--neutral-alpha-medium)",
@@ -238,17 +244,18 @@ export default function ChatPage() {
                 appearance: "none",
               }}
             >
-              <option value="perplexity">Perplexity Sonar</option>
-              <option value="gemini">Gemini Flash</option>
+              <option value="perplexity">Perplexity</option>
+              <option value="gemini">Gemini</option>
             </select>
             <div
               style={{
                 position: "absolute",
-                right: "12px",
+                right: "8px",
                 top: "50%",
                 transform: "translateY(-50%)",
                 pointerEvents: "none",
                 color: "var(--neutral-on-background-weak)",
+                fontSize: "10px",
               }}
             >
               ▼
@@ -259,10 +266,11 @@ export default function ChatPage() {
 
       {/* Messages */}
       <div
+        className="chat-messages"
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "24px 16px",
+          padding: "16px",
         }}
       >
         <div
@@ -271,7 +279,7 @@ export default function ChatPage() {
             margin: "0 auto",
             display: "flex",
             flexDirection: "column",
-            gap: "32px",
+            gap: "24px",
           }}
         >
           {messages.map((message) => (
@@ -308,8 +316,9 @@ export default function ChatPage() {
                 {message.role === "user" ? (
                   // User message with bubble
                   <div
+                    className="user-message-bubble"
                     style={{
-                      maxWidth: "70%",
+                      maxWidth: "85%",
                       padding: "12px 16px",
                       borderRadius: "18px",
                       background: "var(--brand-background-strong)",
@@ -388,9 +397,10 @@ export default function ChatPage() {
           {/* Suggestions - Only show at start */}
           {showSuggestions && (
             <div
+              className="suggestions-grid"
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                 gap: "12px",
                 marginTop: "16px",
               }}
@@ -432,12 +442,13 @@ export default function ChatPage() {
 
       {/* Input Area */}
       <div
+        className="chat-input-area"
         style={{
           position: "sticky",
           bottom: 0,
           backdropFilter: "blur(24px)",
           borderTop: "1px solid var(--neutral-alpha-weak)",
-          padding: "16px",
+          padding: "12px 16px",
         }}
       >
         <div
@@ -445,7 +456,7 @@ export default function ChatPage() {
             maxWidth: "48rem",
             margin: "0 auto",
             display: "flex",
-            gap: "12px",
+            gap: "8px",
             alignItems: "flex-end",
           }}
         >
@@ -485,8 +496,9 @@ export default function ChatPage() {
             size="l"
             variant="primary"
             prefixIcon="send"
+            className="send-button"
           >
-            Send
+            <span className="hide-mobile-text">Send</span>
           </Button>
         </div>
       </div>
@@ -529,6 +541,75 @@ export default function ChatPage() {
 
         .model-selector:focus {
           border-color: var(--brand-alpha-strong);
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .chat-header {
+            padding: 10px 12px !important;
+          }
+
+          .chat-title {
+            font-size: 14px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .hide-mobile {
+            display: none;
+          }
+
+          .hide-mobile-text {
+            display: none;
+          }
+
+          .send-button {
+            min-width: 44px !important;
+            padding: 0 12px !important;
+          }
+
+          .model-selector {
+            font-size: 11px !important;
+            padding: 6px 20px 6px 10px !important;
+          }
+
+          .chat-messages {
+            padding: 12px 8px !important;
+          }
+
+          .user-message-bubble {
+            max-width: 90% !important;
+            padding: 10px 14px !important;
+          }
+
+          .suggestions-grid {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+
+          .chat-input-area {
+            padding: 10px 12px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .chat-header {
+            padding: 8px 10px !important;
+          }
+
+          .chat-title {
+            font-size: 12px !important;
+          }
+
+          .model-selector {
+            font-size: 10px !important;
+            padding: 5px 18px 5px 8px !important;
+          }
+
+          .chat-messages {
+            padding: 10px 6px !important;
+          }
         }
       `}</style>
     </div>
