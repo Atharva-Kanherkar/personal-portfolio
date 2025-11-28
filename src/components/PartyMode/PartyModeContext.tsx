@@ -9,6 +9,9 @@ interface PartyModeContextType {
   currentMode: PartyModeType;
   setMode: (mode: PartyModeType) => void;
   isActive: boolean;
+  customColor: string | null;
+  setCustomColor: (color: string) => void;
+  resetColors: () => void;
 }
 
 const PartyModeContext = createContext<PartyModeContextType | undefined>(undefined);
@@ -17,12 +20,39 @@ const RGB_COLORS = ["cyan", "red", "green", "blue", "magenta", "yellow", "orange
 const DISCO_INTERVAL = 150; // ms between theme switches
 const RGB_INTERVAL = 500; // ms between color changes
 
+// Helper to generate CSS color shades from a hex color
+function generateColorShades(hex: string): Record<string, string> {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return {
+    "--brand-solid-strong": hex,
+    "--brand-solid-medium": hex,
+    "--brand-solid-weak": `rgba(${r}, ${g}, ${b}, 0.8)`,
+    "--brand-alpha-strong": `rgba(${r}, ${g}, ${b}, 0.16)`,
+    "--brand-alpha-medium": `rgba(${r}, ${g}, ${b}, 0.12)`,
+    "--brand-alpha-weak": `rgba(${r}, ${g}, ${b}, 0.08)`,
+    "--brand-on-background-strong": hex,
+    "--brand-on-background-medium": `rgba(${r}, ${g}, ${b}, 0.8)`,
+    "--brand-on-background-weak": `rgba(${r}, ${g}, ${b}, 0.6)`,
+    "--brand-on-solid-strong": r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#000000" : "#ffffff",
+    "--brand-on-solid-medium": r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#333333" : "#e0e0e0",
+    "--brand-on-solid-weak": r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#666666" : "#b0b0b0",
+    "--brand-border-strong": hex,
+    "--brand-border-medium": `rgba(${r}, ${g}, ${b}, 0.5)`,
+    "--brand-border-weak": `rgba(${r}, ${g}, ${b}, 0.3)`,
+  };
+}
+
 export function PartyModeProvider({ children }: { children: React.ReactNode }) {
   const [currentMode, setCurrentMode] = useState<PartyModeType>("none");
+  const [customColor, setCustomColorState] = useState<string | null>(null);
   const { setTheme } = useTheme();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const colorIndexRef = useRef(0);
   const originalBrandRef = useRef<string | null>(null);
+  const originalCssVarsRef = useRef<Record<string, string>>({});
 
   const clearActiveInterval = useCallback(() => {
     if (intervalRef.current) {
@@ -109,6 +139,68 @@ export function PartyModeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentMode, clearActiveInterval, restoreOriginalTheme, startDiscoMode, startRgbMode, startRaveMode]);
 
+  // Set custom color
+  const setCustomColor = useCallback((color: string) => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+
+    // Save original CSS variables if not already saved
+    if (Object.keys(originalCssVarsRef.current).length === 0) {
+      const varsToSave = [
+        "--brand-solid-strong",
+        "--brand-solid-medium",
+        "--brand-solid-weak",
+        "--brand-alpha-strong",
+        "--brand-alpha-medium",
+        "--brand-alpha-weak",
+        "--brand-on-background-strong",
+        "--brand-on-background-medium",
+        "--brand-on-background-weak",
+        "--brand-on-solid-strong",
+        "--brand-on-solid-medium",
+        "--brand-on-solid-weak",
+        "--brand-border-strong",
+        "--brand-border-medium",
+        "--brand-border-weak",
+      ];
+      varsToSave.forEach((varName) => {
+        originalCssVarsRef.current[varName] = computedStyle.getPropertyValue(varName);
+      });
+    }
+
+    // Apply custom color shades
+    const shades = generateColorShades(color);
+    Object.entries(shades).forEach(([varName, value]) => {
+      root.style.setProperty(varName, value);
+    });
+
+    setCustomColorState(color);
+    localStorage.setItem("custom-brand-color", color);
+  }, []);
+
+  // Reset colors to original
+  const resetColors = useCallback(() => {
+    const root = document.documentElement;
+
+    // Restore original CSS variables
+    Object.entries(originalCssVarsRef.current).forEach(([varName, value]) => {
+      root.style.setProperty(varName, value);
+    });
+
+    // Clear refs and state
+    originalCssVarsRef.current = {};
+    setCustomColorState(null);
+    localStorage.removeItem("custom-brand-color");
+  }, []);
+
+  // Load saved custom color on mount
+  useEffect(() => {
+    const savedColor = localStorage.getItem("custom-brand-color");
+    if (savedColor) {
+      setCustomColor(savedColor);
+    }
+  }, [setCustomColor]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -120,7 +212,7 @@ export function PartyModeProvider({ children }: { children: React.ReactNode }) {
   const isActive = currentMode !== "none";
 
   return (
-    <PartyModeContext.Provider value={{ currentMode, setMode, isActive }}>
+    <PartyModeContext.Provider value={{ currentMode, setMode, isActive, customColor, setCustomColor, resetColors }}>
       {children}
     </PartyModeContext.Provider>
   );

@@ -41,3 +41,11 @@
     opacity: 0.5;
   }
 }
+
+.colorSwatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--neutral-alpha-medium);
+  flex-shrink: 0;
+}

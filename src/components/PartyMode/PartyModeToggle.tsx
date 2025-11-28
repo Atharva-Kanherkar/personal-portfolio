@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Row, Column, Text, ToggleButton, IconButton } from "@once-ui-system/core";
+import { Row, Column, Text, ToggleButton, IconButton, Button, Line } from "@once-ui-system/core";
 import { usePartyMode, PartyModeType } from "./PartyModeContext";
+import { ColorPicker } from "./ColorPicker";
 import styles from "./PartyModeToggle.module.scss";
 
 interface ModeOption {
@@ -23,8 +24,9 @@ const MODES: ModeOption[] = [
 ];
 
 export const PartyModeToggle: React.FC = () => {
-  const { currentMode, setMode, isActive } = usePartyMode();
+  const { currentMode, setMode, isActive, setCustomColor, customColor, resetColors } = usePartyMode();
   const [isOpen, setIsOpen] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -109,6 +111,52 @@ export const PartyModeToggle: React.FC = () => {
                 </Column>
               </Row>
             ))}
+
+            <Line background="neutral-alpha-medium" />
+
+            <Row
+              className={`${styles.modeOption} ${customColor ? styles.selected : ""}`}
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              padding="8"
+              radius="s"
+              gap="12"
+              vertical="center"
+            >
+              <div
+                className={styles.colorSwatch}
+                style={{ backgroundColor: customColor || "var(--brand-solid-strong)" }}
+              />
+              <Column gap="2">
+                <Text variant="body-default-s" onBackground="neutral-strong">
+                  Custom Color
+                </Text>
+                <Text variant="body-default-xs" onBackground="neutral-weak">
+                  Pick any color you want
+                </Text>
+              </Column>
+            </Row>
+
+            {showColorPicker && (
+              <Column padding="8" gap="12">
+                <ColorPicker
+                  initialColor={customColor || "#00bcd4"}
+                  onColorChange={(color) => setCustomColor(color)}
+                  label="Brand Color"
+                />
+                <Row gap="8">
+                  <Button
+                    size="s"
+                    variant="secondary"
+                    onClick={() => {
+                      resetColors();
+                      setShowColorPicker(false);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Row>
+              </Column>
+            )}
           </Column>
         </div>
       )}
