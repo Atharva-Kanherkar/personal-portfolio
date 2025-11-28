@@ -72,44 +72,45 @@ export const PartyModeToggle: React.FC = () => {
       />
 
       {isOpen && (
-        <Column
-          className={styles.dropdown}
-          background="page"
-          border="neutral-alpha-weak"
-          radius="m"
-          shadow="l"
-          padding="8"
-          gap="4"
-        >
-          <Text variant="label-default-s" onBackground="neutral-weak" paddingX="8" paddingY="4">
-            Party Modes
-          </Text>
-          {MODES.map((mode) => (
-            <Row
-              key={mode.id}
-              className={`${styles.modeOption} ${!mode.available ? styles.disabled : ""} ${currentMode === mode.id ? styles.selected : ""}`}
-              onClick={() => mode.available && handleModeSelect(mode.id)}
-              padding="8"
-              radius="s"
-              gap="12"
-              vertical="center"
-            >
-              <IconButton
-                icon={mode.icon}
-                size="s"
-                variant={currentMode === mode.id ? "primary" : "secondary"}
-              />
-              <Column gap="2">
-                <Text variant="body-default-s" onBackground={mode.available ? "neutral-strong" : "neutral-weak"}>
-                  {mode.label}
-                </Text>
-                <Text variant="body-default-xs" onBackground="neutral-weak">
-                  {mode.description}
-                </Text>
-              </Column>
-            </Row>
-          ))}
-        </Column>
+        <div className={styles.dropdown}>
+          <Column
+            background="page"
+            border="neutral-alpha-weak"
+            radius="m"
+            shadow="l"
+            padding="8"
+            gap="4"
+          >
+            <Text variant="label-default-s" onBackground="neutral-weak" paddingX="8" paddingY="4">
+              Party Modes
+            </Text>
+            {MODES.map((mode) => (
+              <Row
+                key={mode.id}
+                className={`${styles.modeOption} ${!mode.available ? styles.disabled : ""} ${currentMode === mode.id ? styles.selected : ""}`}
+                onClick={() => mode.available && handleModeSelect(mode.id)}
+                padding="8"
+                radius="s"
+                gap="12"
+                vertical="center"
+              >
+                <IconButton
+                  icon={mode.icon}
+                  size="s"
+                  variant={currentMode === mode.id ? "primary" : "secondary"}
+                />
+                <Column gap="2">
+                  <Text variant="body-default-s" onBackground={mode.available ? "neutral-strong" : "neutral-weak"}>
+                    {mode.label}
+                  </Text>
+                  <Text variant="body-default-xs" onBackground="neutral-weak">
+                    {mode.description}
+                  </Text>
+                </Column>
+              </Row>
+            ))}
+          </Column>
+        </div>
       )}
     </div>
   );
