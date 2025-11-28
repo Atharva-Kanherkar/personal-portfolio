@@ -7,6 +7,7 @@ import { Fade, Flex, Line, Row, ToggleButton } from "@once-ui-system/core";
 
 import { routes, display, person, about, blog, work, gallery } from "@/resources";
 import { ThemeToggle } from "./ThemeToggle";
+import { PartyModeToggle } from "./PartyMode";
 import styles from "./Header.module.scss";
 
 type TimeDisplayProps = {
@@ -170,6 +171,7 @@ export const Header = () => {
                 <>
                   <Line background="neutral-alpha-medium" vert maxHeight="24" />
                   <ThemeToggle />
+                  <PartyModeToggle />
                 </>
               )}
             </Row>

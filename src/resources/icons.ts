@@ -12,6 +12,12 @@ import {
   HiOutlineDocument,
   HiOutlineGlobeAsiaAustralia,
   HiOutlineRocketLaunch,
+  HiSparkles,
+  HiSwatch,
+  HiBolt,
+  HiMusicalNote,
+  HiUserGroup,
+  HiBeaker,
 } from "react-icons/hi2";
 
 import {
@@ -63,6 +69,13 @@ export const iconLibrary: Record<string, IconType> = {
   whatsapp: FaWhatsapp,
   reddit: FaReddit,
   telegram: FaTelegram,
+  // Party mode icons
+  sparkles: HiSparkles,
+  colorPalette: HiSwatch,
+  bolt: HiBolt,
+  music: HiMusicalNote,
+  users: HiUserGroup,
+  coffee: HiBeaker,
 };
 
 export type IconLibrary = typeof iconLibrary;
